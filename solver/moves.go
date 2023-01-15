@@ -41,7 +41,7 @@ var moves = []Move{
 	{"R3", R3},
 }
 
-func moveSubset(moveNames []string) []Move {
+func MoveSubset(moveNames []string) []Move {
 	output := make([]Move, len(moveNames))
 	idx := 0
 	for _, moveName := range moveNames {
@@ -151,7 +151,7 @@ func algString(forward []string, inverse []string) string {
 	return buff.String()
 }
 
-func performAlgorithm(facelets *[48]int, algorithm string) {
+func PerformAlgorithm(facelets *[48]int, algorithm string) {
 	for _, move := range strings.Split(algorithm, " ") {
 		switch move {
 		case "U":

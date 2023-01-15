@@ -1,82 +1,85 @@
-package solver
+package main
 
 import (
 	"fmt"
+	"os"
+	"solver"
+	"strconv"
+	"time"
 )
 
-func lastMoveSameFace(moves []string, move string) bool {
-	// If there are no moves in the array, there is no last move
-	if len(moves) == 0 {
-		return false
+const KEY_SCRAMBLE = "-scramble"
+const KEY_MOVES = "-moves"
+const KEY_SOLUTIONS = "-solutions"
+
+const DEFAULT_SCRAMBLE = ""
+const DEFAULT_MOVES = "UFDLRB"
+const DEFAULT_SOLUTIONS = "1"
+
+func main() {
+	args := os.Args
+
+	argMap := make(map[string]string)
+	argMap[KEY_SCRAMBLE] = DEFAULT_SCRAMBLE
+	argMap[KEY_MOVES] = DEFAULT_MOVES
+	argMap[KEY_SOLUTIONS] = DEFAULT_SOLUTIONS
+
+	key := ""
+	for i := 1; i < len(args); i++ {
+		if i%2 == 1 {
+			// Odd index means it should be a key
+			if args[i] != KEY_SCRAMBLE && args[i] != KEY_MOVES && args[i] != KEY_SOLUTIONS {
+				fmt.Printf("Invalid key: %s", args[i])
+				return
+			}
+			key = args[i]
+		} else {
+			argMap[key] = args[i]
+			key = ""
+		}
 	}
 
-	lastMove := moves[len(moves)-1]
+	if key != "" {
+		fmt.Printf("Expected an argument for: %s", key)
+		return
+	}
 
-	// Compare the first character
-	// e.g. if the moves are R1 and R2, then those are on the same face
-	return lastMove[0] == move[0]
-}
+	facelets := solver.SolvedFacelets()
+	solver.PerformAlgorithm(&facelets, argMap[KEY_SCRAMBLE])
 
-func solve(facelets [48]int, moves []Move) {
-	depth := 0
-	visited := initVisited()
-	queue := []Node{{facelets, []string{}}}
-
-	inverseDepth := 0
-	inverseVisited := initVisited()
-	inverseQueue := []Node{{solvedFacelets(), []string{}}}
-
-	solutions := 0
-	for loc := 0; ; loc++ {
-		node := queue[0]
-		queue = queue[1:]
-
-		inverseNode := inverseQueue[0]
-		inverseQueue = inverseQueue[1:]
-
-		algs := get(visited, inverseNode.facelets)
-		for _, alg := range algs {
-			solutions++
-			// fmt.Printf("Inverse solution #%d at location %d!\n", solutions, loc)
-			// fmt.Printf("Forward: %v, Inverse: %v\n", alg, inverseNode.moves)
-			fmt.Println(algString(alg, inverseNode.moves))
-		}
-
-		inverseAlgs := get(inverseVisited, node.facelets)
-		for _, inverseAlg := range inverseAlgs {
-			solutions++
-			// fmt.Printf("Solution #%d at location %d!\n", solutions, loc)
-			// fmt.Printf("Forward: %v, Inverse: %v\n", node.moves, inverseAlg)
-			fmt.Println(algString(node.moves, inverseAlg))
-		}
-
-		if len(node.moves) > depth {
-			depth = len(node.moves)
-			fmt.Printf("Searching depth: %d\n", depth)
-		}
-
-		if len(inverseNode.moves) > inverseDepth {
-			inverseDepth = len(inverseNode.moves)
-			fmt.Printf("Searching inverse depth: %d\n", inverseDepth)
-		}
-
-		for _, move := range moves {
-			if !lastMoveSameFace(node.moves, move.name) {
-				cpy := node.facelets
-				move.proc(&cpy)
-				newMoves := appendImmutable(node.moves, move.name)
-				queue = append(queue, Node{cpy, newMoves})
-
-				add(visited, cpy, newMoves)
-			}
-			if !lastMoveSameFace(inverseNode.moves, move.name) {
-				cpy := inverseNode.facelets
-				move.proc(&cpy)
-				newMoves := appendImmutable(inverseNode.moves, move.name)
-				inverseQueue = append(inverseQueue, Node{cpy, newMoves})
-
-				add(inverseVisited, cpy, newMoves)
-			}
+	var moveNames []string
+	fmt.Println("Moves:", argMap[KEY_MOVES])
+	for _, char := range argMap[KEY_MOVES] {
+		switch char {
+		case 'U':
+			moveNames = append(moveNames, "U1", "U2", "U3")
+		case 'F':
+			moveNames = append(moveNames, "F1", "F2", "F3")
+		case 'D':
+			moveNames = append(moveNames, "D1", "D2", "D3")
+		case 'B':
+			moveNames = append(moveNames, "B1", "B2", "B3")
+		case 'L':
+			moveNames = append(moveNames, "L1", "L2", "L3")
+		case 'R':
+			moveNames = append(moveNames, "R1", "R2", "R3")
+		default:
+			fmt.Printf("Invalid character: %c", char)
+			return
 		}
 	}
+	moves := solver.MoveSubset(moveNames)
+
+	maxSolutions, err := strconv.Atoi(argMap[KEY_SOLUTIONS])
+	if err != nil {
+		fmt.Printf("Invalid integer: %s", argMap[KEY_SOLUTIONS])
+		return
+	}
+
+	startTime := time.Now()
+
+	solver.Solve(facelets, moves, maxSolutions)
+
+	endTime := time.Now()
+	fmt.Printf("Time: %v", endTime.Sub(startTime))
 }

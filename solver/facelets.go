@@ -1,6 +1,6 @@
 package solver
 
-func solvedFacelets() [48]int {
+func SolvedFacelets() [48]int {
 	return [48]int{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
 }
 
