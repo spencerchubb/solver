@@ -17,7 +17,7 @@ func lastMoveSameFace(moves []string, move string) bool {
 	return lastMove[0] == move[0]
 }
 
-func Solve(facelets [48]int, moves []Move, maxSolutions int) {
+func Solve(facelets [48]int, moves []Move, maxSolutions int, log bool) []string {
 	depth := 0
 	visited := initVisited()
 	queue := []Node{{facelets, []string{}}}
@@ -26,7 +26,7 @@ func Solve(facelets [48]int, moves []Move, maxSolutions int) {
 	inverseVisited := initVisited()
 	inverseQueue := []Node{{SolvedFacelets(), []string{}}}
 
-	solutions := 0
+	var solutions []string
 	for loc := 0; ; loc++ {
 		node := queue[0]
 		queue = queue[1:]
@@ -36,28 +36,34 @@ func Solve(facelets [48]int, moves []Move, maxSolutions int) {
 
 		algs := get(visited, inverseNode.facelets)
 		for _, alg := range algs {
-			solutions++
-			fmt.Println(algString(alg, inverseNode.moves))
-			if solutions >= maxSolutions {
-				return
+			algStr := algString(alg, inverseNode.moves)
+			if log {
+				fmt.Println(algStr)
+			}
+			solutions = append(solutions, algStr)
+			if len(solutions) >= maxSolutions {
+				return solutions
 			}
 		}
 
 		inverseAlgs := get(inverseVisited, node.facelets)
 		for _, inverseAlg := range inverseAlgs {
-			solutions++
-			fmt.Println(algString(node.moves, inverseAlg))
-			if solutions >= maxSolutions {
-				return
+			algStr := algString(node.moves, inverseAlg)
+			if log {
+				fmt.Println(algStr)
+			}
+			solutions = append(solutions, algStr)
+			if len(solutions) >= maxSolutions {
+				return solutions
 			}
 		}
 
-		if len(node.moves) > depth {
+		if log && len(node.moves) > depth {
 			depth = len(node.moves)
 			fmt.Printf("Searching depth: %d\n", depth)
 		}
 
-		if len(inverseNode.moves) > inverseDepth {
+		if log && len(inverseNode.moves) > inverseDepth {
 			inverseDepth = len(inverseNode.moves)
 			fmt.Printf("Searching inverse depth: %d\n", inverseDepth)
 		}

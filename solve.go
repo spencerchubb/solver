@@ -78,7 +78,7 @@ func main() {
 
 	startTime := time.Now()
 
-	solver.Solve(facelets, moves, maxSolutions)
+	solver.Solve(facelets, moves, maxSolutions, true)
 
 	endTime := time.Now()
 	fmt.Printf("Time: %v", endTime.Sub(startTime))
