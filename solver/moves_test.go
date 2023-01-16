@@ -1,6 +1,8 @@
 package solver
 
-import "testing"
+import (
+	"testing"
+)
 
 func assertFaceletsEq(t *testing.T, testName string, expected, actual Facelets) {
 	if !faceletsEq(expected, actual) {
@@ -167,27 +169,54 @@ func TestR3(t *testing.T) {
 	assertFaceletsEq(t, "TestR3", expected, facelets)
 }
 
+func TestMultiple(t *testing.T) {
+	facelets := SolvedFacelets()
+	U1(&facelets)
+	F1(&facelets)
+	D1(&facelets)
+	expected := Facelets{U, U, L, U, L, U, U, F, F, F, L, F, L, R, R, D, D, D, D, D, D, R, R, B, R, B, L, R, L, U, B, L, F, L, B, F, B, D, D, B, U, U, F, B, F, B, R, R}
+	assertFaceletsEq(t, "TestMultiple A", expected, facelets)
+	B1(&facelets)
+	L1(&facelets)
+	R1(&facelets)
+	expected = Facelets{L, L, L, R, L, R, R, D, B, U, L, F, L, R, R, B, F, F, L, D, L, R, R, U, D, D, F, B, B, R, U, F, U, B, B, U, D, U, F, D, F, F, D, U, D, U, B, B}
+	assertFaceletsEq(t, "TestMultiple B", expected, facelets)
+	F1(&facelets)
+	L1(&facelets)
+	B1(&facelets)
+	expected = Facelets{U, D, F, B, F, B, R, U, L, L, D, U, R, B, F, R, L, L, B, F, D, F, R, R, L, B, F, F, U, D, B, R, R, R, D, B, D, U, U, F, L, L, D, U, D, U, L, B}
+	assertFaceletsEq(t, "TestMultiple C", expected, facelets)
+	U1(&facelets)
+	R1(&facelets)
+	D1(&facelets)
+	expected = Facelets{F, F, U, D, R, U, F, R, L, L, D, U, D, F, R, F, B, D, R, L, B, L, F, D, F, B, U, L, B, B, B, B, L, R, U, U, F, B, U, L, D, D, D, L, R, R, U, R}
+	assertFaceletsEq(t, "TestMultiple D", expected, facelets)
+}
+
 func TestAll(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
+	facelets := SolvedFacelets()
 	U1(&facelets)
 	F1(&facelets)
 	D1(&facelets)
 	B1(&facelets)
 	L1(&facelets)
 	R1(&facelets)
+	expected := Facelets{L, L, L, R, L, R, R, D, B, U, L, F, L, R, R, B, F, F, L, D, L, R, R, U, D, D, F, B, B, R, U, F, U, B, B, U, D, U, F, D, F, F, D, U, D, U, B, B}
+	assertFaceletsEq(t, "TestAll A", expected, facelets)
 	U2(&facelets)
 	F2(&facelets)
 	D2(&facelets)
 	B2(&facelets)
 	L2(&facelets)
 	R2(&facelets)
+	expected = Facelets{U, R, L, R, D, L, F, D, B, U, F, L, B, R, D, F, L, R, R, L, L, R, L, F, B, R, R, F, B, L, U, D, B, F, D, D, U, U, B, U, F, B, U, D, U, B, F, D}
+	assertFaceletsEq(t, "TestAll B", expected, facelets)
 	U3(&facelets)
 	F3(&facelets)
 	D3(&facelets)
 	B3(&facelets)
 	L3(&facelets)
 	R3(&facelets)
-	expected := Facelets{U, D, L, F, B, F, D, B, U, B, B, D, U, D, D, U, D, U, U, L, F, F, B, D, B, R, B, U, R, F, L, R, L, B, R, R, R, F, U, R, L, L, R, F, L, D, F, L}
-	assertFaceletsEq(t, "TestAll", expected, facelets)
-
+	expected = Facelets{U, D, L, F, B, F, D, B, U, B, B, D, U, D, D, U, D, U, U, L, F, F, B, D, B, R, B, U, R, F, L, R, L, B, R, R, R, F, U, R, L, L, R, F, L, D, F, L}
+	assertFaceletsEq(t, "TestAll C", expected, facelets)
 }
