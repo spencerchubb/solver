@@ -1,13 +1,13 @@
 package solver
 
 type Moves []string
-type Visited map[[48]int][]Moves
+type Visited map[Facelets][]Moves
 
-func add(visited Visited, facelets [48]int, moves Moves) {
+func add(visited Visited, facelets Facelets, moves Moves) {
 	visited[facelets] = append(visited[facelets], moves)
 }
 
-func get(visited Visited, facelets [48]int) []Moves {
+func get(visited Visited, facelets Facelets) []Moves {
 	return visited[facelets]
 }
 

@@ -1,10 +1,18 @@
 package solver
 
-func SolvedFacelets() [48]int {
-	return [48]int{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
+type Facelet byte
+
+// Facelets is a byte array for performance reasons.
+// I considered making it an int array, but found that a byte array was faster.
+// In the solver program, Facelets are commonly used as map keys.
+// I'm not certain why a byte array is faster than an int array, but I would guess that int arrays have to be converted to bytes before they can be used as a key.
+type Facelets [48]Facelet
+
+func SolvedFacelets() Facelets {
+	return [48]Facelet{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
 }
 
-func faceletsEq(a, b [48]int) bool {
+func faceletsEq(a, b Facelets) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -16,7 +24,7 @@ func faceletsEq(a, b [48]int) bool {
 	return true
 }
 
-func faceletsToStr(arr [48]int) string {
+func faceletsToStr(arr Facelets) string {
 	bytes := make([]byte, 48)
 	for i, facelet := range arr {
 		switch facelet {

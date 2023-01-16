@@ -1,8 +1,8 @@
 package solver
 
-const U = 0
-const F = 1
-const D = 2
-const B = 3
-const L = 4
-const R = 5
+const U = 'U'
+const F = 'F'
+const D = 'D'
+const B = 'B'
+const L = 'L'
+const R = 'R'

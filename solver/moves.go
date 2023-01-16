@@ -17,7 +17,7 @@ import (
 
 type Move struct {
 	name string
-	proc func(*[48]int)
+	proc func(*Facelets)
 }
 
 var moves = []Move{
@@ -55,13 +55,13 @@ func MoveSubset(moveNames []string) []Move {
 	return output
 }
 
-func swap2(arr *[48]int, a, b int) {
+func swap2(arr *Facelets, a, b int) {
 	temp := arr[b]
 	arr[b] = arr[a]
 	arr[a] = temp
 }
 
-func swap4(arr *[48]int, a, b, c, d int) {
+func swap4(arr *Facelets, a, b, c, d int) {
 	temp := arr[d]
 	arr[d] = arr[c]
 	arr[c] = arr[b]
@@ -69,7 +69,7 @@ func swap4(arr *[48]int, a, b, c, d int) {
 	arr[a] = temp
 }
 
-func performMultipleMoves(facelets *[48]int, moveNames []string) {
+func performMultipleMoves(facelets *Facelets, moveNames []string) {
 	for _, moveName := range moveNames {
 		switch moveName {
 		case "U1":
@@ -151,7 +151,7 @@ func algString(forward []string, inverse []string) string {
 	return buff.String()
 }
 
-func PerformAlgorithm(facelets *[48]int, algorithm string) {
+func PerformAlgorithm(facelets *Facelets, algorithm string) {
 	for _, move := range strings.Split(algorithm, " ") {
 		switch move {
 		case "U":
@@ -194,7 +194,7 @@ func PerformAlgorithm(facelets *[48]int, algorithm string) {
 	}
 }
 
-func U1(facelets *[48]int) {
+func U1(facelets *Facelets) {
 	swap4(facelets, 00, 05, 07, 02)
 	swap4(facelets, 01, 03, 06, 04)
 	swap4(facelets, 8, 32, 31, 40)
@@ -202,7 +202,7 @@ func U1(facelets *[48]int) {
 	swap4(facelets, 13, 37, 26, 45)
 }
 
-func U2(facelets *[48]int) {
+func U2(facelets *Facelets) {
 	swap2(facelets, 00, 07)
 	swap2(facelets, 05, 02)
 	swap2(facelets, 01, 06)
@@ -215,7 +215,7 @@ func U2(facelets *[48]int) {
 	swap2(facelets, 37, 45)
 }
 
-func U3(facelets *[48]int) {
+func U3(facelets *Facelets) {
 	swap4(facelets, 00, 02, 07, 05)
 	swap4(facelets, 01, 04, 06, 03)
 	swap4(facelets, 8, 40, 31, 32)
@@ -223,7 +223,7 @@ func U3(facelets *[48]int) {
 	swap4(facelets, 13, 45, 26, 37)
 }
 
-func F1(facelets *[48]int) {
+func F1(facelets *Facelets) {
 	swap4(facelets, 8, 13, 15, 10)
 	swap4(facelets, 9, 11, 14, 12)
 	swap4(facelets, 02, 40, 21, 39)
@@ -231,7 +231,7 @@ func F1(facelets *[48]int) {
 	swap4(facelets, 07, 42, 16, 37)
 }
 
-func F2(facelets *[48]int) {
+func F2(facelets *Facelets) {
 	swap2(facelets, 8, 15)
 	swap2(facelets, 13, 10)
 	swap2(facelets, 9, 14)
@@ -244,7 +244,7 @@ func F2(facelets *[48]int) {
 	swap2(facelets, 42, 37)
 }
 
-func F3(facelets *[48]int) {
+func F3(facelets *Facelets) {
 	swap4(facelets, 8, 10, 15, 13)
 	swap4(facelets, 9, 12, 14, 11)
 	swap4(facelets, 02, 39, 21, 40)
@@ -252,7 +252,7 @@ func F3(facelets *[48]int) {
 	swap4(facelets, 07, 37, 16, 42)
 }
 
-func D1(facelets *[48]int) {
+func D1(facelets *Facelets) {
 	swap4(facelets, 16, 21, 23, 18)
 	swap4(facelets, 17, 19, 22, 20)
 	swap4(facelets, 10, 42, 29, 34)
@@ -260,7 +260,7 @@ func D1(facelets *[48]int) {
 	swap4(facelets, 15, 47, 24, 39)
 }
 
-func D2(facelets *[48]int) {
+func D2(facelets *Facelets) {
 	swap2(facelets, 16, 23)
 	swap2(facelets, 21, 18)
 	swap2(facelets, 17, 22)
@@ -273,7 +273,7 @@ func D2(facelets *[48]int) {
 	swap2(facelets, 47, 39)
 }
 
-func D3(facelets *[48]int) {
+func D3(facelets *Facelets) {
 	swap4(facelets, 16, 18, 23, 21)
 	swap4(facelets, 17, 20, 22, 19)
 	swap4(facelets, 10, 34, 29, 42)
@@ -281,7 +281,7 @@ func D3(facelets *[48]int) {
 	swap4(facelets, 15, 39, 24, 47)
 }
 
-func B1(facelets *[48]int) {
+func B1(facelets *Facelets) {
 	swap4(facelets, 24, 29, 31, 26)
 	swap4(facelets, 25, 27, 30, 28)
 	swap4(facelets, 00, 34, 23, 45)
@@ -289,7 +289,7 @@ func B1(facelets *[48]int) {
 	swap4(facelets, 05, 32, 18, 47)
 }
 
-func B2(facelets *[48]int) {
+func B2(facelets *Facelets) {
 	swap2(facelets, 24, 31)
 	swap2(facelets, 29, 26)
 	swap2(facelets, 25, 30)
@@ -302,7 +302,7 @@ func B2(facelets *[48]int) {
 	swap2(facelets, 32, 47)
 }
 
-func B3(facelets *[48]int) {
+func B3(facelets *Facelets) {
 	swap4(facelets, 24, 26, 31, 29)
 	swap4(facelets, 25, 28, 30, 27)
 	swap4(facelets, 00, 45, 23, 34)
@@ -310,7 +310,7 @@ func B3(facelets *[48]int) {
 	swap4(facelets, 05, 47, 18, 32)
 }
 
-func L1(facelets *[48]int) {
+func L1(facelets *Facelets) {
 	swap4(facelets, 32, 37, 39, 34)
 	swap4(facelets, 33, 35, 38, 36)
 	swap4(facelets, 26, 02, 10, 18)
@@ -318,7 +318,7 @@ func L1(facelets *[48]int) {
 	swap4(facelets, 24, 00, 8, 16)
 }
 
-func L2(facelets *[48]int) {
+func L2(facelets *Facelets) {
 	swap2(facelets, 32, 39)
 	swap2(facelets, 37, 34)
 	swap2(facelets, 33, 38)
@@ -331,7 +331,7 @@ func L2(facelets *[48]int) {
 	swap2(facelets, 00, 16)
 }
 
-func L3(facelets *[48]int) {
+func L3(facelets *Facelets) {
 	swap4(facelets, 32, 34, 39, 37)
 	swap4(facelets, 33, 36, 38, 35)
 	swap4(facelets, 26, 18, 10, 02)
@@ -339,7 +339,7 @@ func L3(facelets *[48]int) {
 	swap4(facelets, 24, 16, 8, 00)
 }
 
-func R1(facelets *[48]int) {
+func R1(facelets *Facelets) {
 	swap4(facelets, 40, 45, 47, 42)
 	swap4(facelets, 41, 43, 46, 44)
 	swap4(facelets, 05, 29, 21, 13)
@@ -347,7 +347,7 @@ func R1(facelets *[48]int) {
 	swap4(facelets, 07, 31, 23, 15)
 }
 
-func R2(facelets *[48]int) {
+func R2(facelets *Facelets) {
 	swap2(facelets, 40, 47)
 	swap2(facelets, 45, 42)
 	swap2(facelets, 41, 46)
@@ -360,7 +360,7 @@ func R2(facelets *[48]int) {
 	swap2(facelets, 31, 15)
 }
 
-func R3(facelets *[48]int) {
+func R3(facelets *Facelets) {
 	swap4(facelets, 40, 42, 47, 45)
 	swap4(facelets, 41, 44, 46, 43)
 	swap4(facelets, 05, 13, 21, 29)

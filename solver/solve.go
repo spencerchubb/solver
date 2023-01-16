@@ -17,7 +17,7 @@ func lastMoveSameFace(moves []string, move string) bool {
 	return lastMove[0] == move[0]
 }
 
-func Solve(facelets [48]int, moves []Move, maxSolutions int, log bool) []string {
+func Solve(facelets Facelets, moves []Move, maxSolutions int, log bool) []string {
 	depth := 0
 	visited := initVisited()
 	queue := []Node{{facelets, []string{}}}
