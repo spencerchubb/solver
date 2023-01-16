@@ -9,7 +9,7 @@ func TestSolve(t *testing.T) {
 	facelets := SolvedFacelets()
 	PerformAlgorithm(&facelets, "R U R' F' R U R' U' R' F R2 U' R' U'")
 
-	moves := MoveSubset([]string{"U1", "U2", "U3", "F1", "F2", "F3", "R1", "R2", "R3"}) // RUF
+	moves := []int{0, 1, 2, 3, 4, 5, 15, 16, 17}
 
 	solutions := Solve(facelets, moves, 10, false)
 	for _, solution := range solutions {

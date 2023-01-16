@@ -15,44 +15,88 @@ import (
 //          17    22
 //          18 20 23
 
-type Move struct {
-	name string
-	proc func(*Facelets)
+var moveAliases = []byte{
+	0x00,
+	0x01,
+	0x02,
+	0x03,
+	0x04,
+	0x05,
+	0x06,
+	0x07,
+	0x08,
+	0x09,
+	0x0A,
+	0x0B,
+	0x0C,
+	0x0D,
+	0x0E,
+	0x0F,
+	0x10,
+	0x11,
 }
 
-var moves = []Move{
-	{"U1", U1},
-	{"U2", U2},
-	{"U3", U3},
-	{"F1", F1},
-	{"F2", F2},
-	{"F3", F3},
-	{"D1", D1},
-	{"D2", D2},
-	{"D3", D3},
-	{"B1", B1},
-	{"B2", B2},
-	{"B3", B3},
-	{"L1", L1},
-	{"L2", L2},
-	{"L3", L3},
-	{"R1", R1},
-	{"R2", R2},
-	{"R3", R3},
+var moveNames = []string{
+	"U",
+	"U2",
+	"U'",
+	"F",
+	"F2",
+	"F'",
+	"D",
+	"D2",
+	"D'",
+	"B",
+	"B2",
+	"B'",
+	"L",
+	"L2",
+	"L'",
+	"R",
+	"R2",
+	"R'",
 }
 
-func MoveSubset(moveNames []string) []Move {
-	output := make([]Move, len(moveNames))
-	idx := 0
-	for _, moveName := range moveNames {
-		for _, move := range moves {
-			if moveName == move.name {
-				output[idx] = move
-				idx++
-			}
-		}
-	}
-	return output
+var inverseMoveNames = []string{
+	"U'",
+	"U2",
+	"U",
+	"F'",
+	"F2",
+	"F",
+	"D'",
+	"D2",
+	"D",
+	"B'",
+	"B2",
+	"B",
+	"L'",
+	"L2",
+	"L",
+	"R'",
+	"R2",
+	"R",
+}
+
+var allMoves = []func(*Facelets){
+	U1,
+	U2,
+	U3,
+	F1,
+	F2,
+	F3,
+	D1,
+	D2,
+	D3,
+	B1,
+	B2,
+	B3,
+	L1,
+	L2,
+	L3,
+	R1,
+	R2,
+	R3,
 }
 
 func swap2(arr *Facelets, a, b int) {
@@ -112,20 +156,13 @@ func performMultipleMoves(facelets *Facelets, moveNames []string) {
 	}
 }
 
-func algString(forward []string, inverse []string) string {
+func algString(forward []byte, inverse []byte) string {
 	buff := bytes.NewBufferString("")
 	inverseHasMoves := len(inverse) > 0
 	for i := 0; i < len(forward); i++ {
 		move := forward[i]
-		buff.WriteByte(move[0])
-		switch move[1] {
-		case '1':
-			break
-		case '2':
-			buff.WriteByte('2')
-		case '3':
-			buff.WriteByte('\'')
-		}
+		name := moveNames[move]
+		buff.WriteString(name)
 
 		// Don't add a space after the last move if there are no inverse moves
 		if i < len(forward)-1 || inverseHasMoves {
@@ -134,15 +171,8 @@ func algString(forward []string, inverse []string) string {
 	}
 	for i := len(inverse) - 1; i >= 0; i-- {
 		move := inverse[i]
-		buff.WriteByte(move[0])
-		switch move[1] {
-		case '1':
-			buff.WriteByte('\'')
-		case '2':
-			buff.WriteByte('2')
-		case '3':
-			break
-		}
+		name := inverseMoveNames[move]
+		buff.WriteString(name)
 
 		if i > 0 {
 			buff.WriteByte(' ')

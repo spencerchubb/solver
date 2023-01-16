@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func lastMoveSameFace(moves []string, move string) bool {
+func lastMoveSameFace(moves []byte, move byte) bool {
 	// If there are no moves in the array, there is no last move
 	if len(moves) == 0 {
 		return false
@@ -12,19 +12,22 @@ func lastMoveSameFace(moves []string, move string) bool {
 
 	lastMove := moves[len(moves)-1]
 
-	// Compare the first character
-	// e.g. if the moves are R1 and R2, then those are on the same face
-	return lastMove[0] == move[0]
+	// If the moves are on the same face, then these should be equal.
+	// e.g. U1 is associated with 0x00, and U3 is associated with 0x02.
+	// With integer division, 0x00/3 is 0, and 0x02/3 is 0.
+	return lastMove/3 == move/3
 }
 
-func Solve(facelets Facelets, moves []Move, maxSolutions int, log bool) []string {
+func Solve(facelets Facelets, moves []int, maxSolutions int, log bool) []string {
 	depth := 0
-	visited := initVisited()
-	queue := []Node{{facelets, []string{}}}
-
 	inverseDepth := 0
+
+	visited := initVisited()
 	inverseVisited := initVisited()
-	inverseQueue := []Node{{SolvedFacelets(), []string{}}}
+
+	// It is faster with *Node instead of Node
+	queue := []*Node{{facelets, []byte{}}}
+	inverseQueue := []*Node{{SolvedFacelets(), []byte{}}}
 
 	var solutions []string
 	for loc := 0; ; loc++ {
@@ -69,19 +72,19 @@ func Solve(facelets Facelets, moves []Move, maxSolutions int, log bool) []string
 		}
 
 		for _, move := range moves {
-			if !lastMoveSameFace(node.moves, move.name) {
+			if !lastMoveSameFace(node.moves, moveAliases[move]) {
 				cpy := node.facelets
-				move.proc(&cpy)
-				newMoves := appendImmutable(node.moves, move.name)
-				queue = append(queue, Node{cpy, newMoves})
+				allMoves[move](&cpy)
+				newMoves := appendImmutable(node.moves, moveAliases[move])
+				queue = append(queue, &Node{cpy, newMoves})
 
 				add(visited, cpy, newMoves)
 			}
-			if !lastMoveSameFace(inverseNode.moves, move.name) {
+			if !lastMoveSameFace(inverseNode.moves, moveAliases[move]) {
 				cpy := inverseNode.facelets
-				move.proc(&cpy)
-				newMoves := appendImmutable(inverseNode.moves, move.name)
-				inverseQueue = append(inverseQueue, Node{cpy, newMoves})
+				allMoves[move](&cpy)
+				newMoves := appendImmutable(inverseNode.moves, moveAliases[move])
+				inverseQueue = append(inverseQueue, &Node{cpy, newMoves})
 
 				add(inverseVisited, cpy, newMoves)
 			}

@@ -1,6 +1,6 @@
 package solver
 
-type Moves []string
+type Moves []byte
 type Visited map[Facelets][]Moves
 
 func add(visited Visited, facelets Facelets, moves Moves) {
