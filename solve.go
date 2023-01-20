@@ -44,30 +44,8 @@ func main() {
 		return
 	}
 
-	facelets := solver.SolvedFacelets()
-	solver.PerformAlgorithm(&facelets, argMap[KEY_SCRAMBLE])
-
-	// var moveNames []string
-	// for _, char := range argMap[KEY_MOVES] {
-	// 	switch char {
-	// 	case 'U':
-	// 		moveNames = append(moveNames, "U1", "U2", "U3")
-	// 	case 'F':
-	// 		moveNames = append(moveNames, "F1", "F2", "F3")
-	// 	case 'D':
-	// 		moveNames = append(moveNames, "D1", "D2", "D3")
-	// 	case 'B':
-	// 		moveNames = append(moveNames, "B1", "B2", "B3")
-	// 	case 'L':
-	// 		moveNames = append(moveNames, "L1", "L2", "L3")
-	// 	case 'R':
-	// 		moveNames = append(moveNames, "R1", "R2", "R3")
-	// 	default:
-	// 		fmt.Printf("Invalid character: %c", char)
-	// 		return
-	// 	}
-	// }
-	// moves := solver.MoveSubset(moveNames)
+	cube := solver.NewCube()
+	solver.PerformAlgorithm(&cube, argMap[KEY_SCRAMBLE])
 
 	var moves []int
 	for _, char := range argMap[KEY_MOVES] {
@@ -98,7 +76,7 @@ func main() {
 
 	startTime := time.Now()
 
-	solver.Solve(facelets, moves, maxSolutions, true)
+	solver.Solve(cube, moves, maxSolutions, true)
 
 	endTime := time.Now()
 	fmt.Printf("Time: %v", endTime.Sub(startTime))

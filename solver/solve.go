@@ -18,7 +18,7 @@ func lastMoveSameFace(moves []byte, move byte) bool {
 	return lastMove/3 == move/3
 }
 
-func Solve(facelets Facelets, moves []int, maxSolutions int, log bool) []string {
+func Solve(cube Cube, moves []int, maxSolutions int, log bool) []string {
 	depth := 0
 	inverseDepth := 0
 
@@ -26,8 +26,8 @@ func Solve(facelets Facelets, moves []int, maxSolutions int, log bool) []string 
 	inverseVisited := initVisited()
 
 	// It is faster with *Node instead of Node
-	queue := []*Node{{facelets, []byte{}}}
-	inverseQueue := []*Node{{SolvedFacelets(), []byte{}}}
+	queue := []*Node{{cube, &[]byte{}}}
+	inverseQueue := []*Node{{NewCube(), &[]byte{}}}
 
 	var solutions []string
 	for loc := 0; ; loc++ {
@@ -37,9 +37,9 @@ func Solve(facelets Facelets, moves []int, maxSolutions int, log bool) []string 
 		inverseNode := inverseQueue[0]
 		inverseQueue = inverseQueue[1:]
 
-		algs := get(visited, inverseNode.facelets)
+		algs := get(visited, inverseNode.cube)
 		for _, alg := range algs {
-			algStr := algString(alg, inverseNode.moves)
+			algStr := algString(alg, *inverseNode.moves)
 			if log {
 				fmt.Println(algStr)
 			}
@@ -49,9 +49,9 @@ func Solve(facelets Facelets, moves []int, maxSolutions int, log bool) []string 
 			}
 		}
 
-		inverseAlgs := get(inverseVisited, node.facelets)
+		inverseAlgs := get(inverseVisited, node.cube)
 		for _, inverseAlg := range inverseAlgs {
-			algStr := algString(node.moves, inverseAlg)
+			algStr := algString(*node.moves, inverseAlg)
 			if log {
 				fmt.Println(algStr)
 			}
@@ -61,30 +61,30 @@ func Solve(facelets Facelets, moves []int, maxSolutions int, log bool) []string 
 			}
 		}
 
-		if log && len(node.moves) > depth {
-			depth = len(node.moves)
+		if log && len(*node.moves) > depth {
+			depth = len(*node.moves)
 			fmt.Printf("Searching depth: %d\n", depth)
 		}
 
-		if log && len(inverseNode.moves) > inverseDepth {
-			inverseDepth = len(inverseNode.moves)
+		if log && len(*inverseNode.moves) > inverseDepth {
+			inverseDepth = len(*inverseNode.moves)
 			fmt.Printf("Searching inverse depth: %d\n", inverseDepth)
 		}
 
 		for _, move := range moves {
-			if !lastMoveSameFace(node.moves, moveAliases[move]) {
-				cpy := node.facelets
+			if !lastMoveSameFace(*node.moves, moveAliases[move]) {
+				cpy := node.cube
 				allMoves[move](&cpy)
-				newMoves := appendImmutable(node.moves, moveAliases[move])
-				queue = append(queue, &Node{cpy, newMoves})
+				newMoves := appendImmutable(*node.moves, moveAliases[move])
+				queue = append(queue, &Node{cpy, &newMoves})
 
 				add(visited, cpy, newMoves)
 			}
-			if !lastMoveSameFace(inverseNode.moves, moveAliases[move]) {
-				cpy := inverseNode.facelets
+			if !lastMoveSameFace(*inverseNode.moves, moveAliases[move]) {
+				cpy := inverseNode.cube
 				allMoves[move](&cpy)
-				newMoves := appendImmutable(inverseNode.moves, moveAliases[move])
-				inverseQueue = append(inverseQueue, &Node{cpy, newMoves})
+				newMoves := appendImmutable(*inverseNode.moves, moveAliases[move])
+				inverseQueue = append(inverseQueue, &Node{cpy, &newMoves})
 
 				add(inverseVisited, cpy, newMoves)
 			}

@@ -5,15 +5,15 @@ import (
 	"strings"
 )
 
-//          00 03 05
-//		    01    06
-//          02 04 07
-// 32 35 37 08 11 13 40 43 45 31 28 26
-// 33    38 09    14 41    46 30	25
-// 34 36 39 10 12 15 42 44 47 29 27 24
-//          16 19 21
-//          17    22
-//          18 20 23
+//          00 08 01
+//          09    10
+//          02 11 03
+// 00 09 02 02 11 03 03 10 02 02 08 00
+// 18    12 12    13 13    19 19    18
+// 06 15 04 04 14 05 05 16 07 07 17 06
+//          04 14 05
+//          15    16
+//          06 17 07
 
 var moveAliases = []byte{
 	0x00,
@@ -78,7 +78,7 @@ var inverseMoveNames = []string{
 	"R",
 }
 
-var allMoves = []func(*Facelets){
+var allMoves = []func(*Cube){
 	U1,
 	U2,
 	U3,
@@ -97,63 +97,6 @@ var allMoves = []func(*Facelets){
 	R1,
 	R2,
 	R3,
-}
-
-func swap2(arr *Facelets, a, b int) {
-	temp := arr[b]
-	arr[b] = arr[a]
-	arr[a] = temp
-}
-
-func swap4(arr *Facelets, a, b, c, d int) {
-	temp := arr[d]
-	arr[d] = arr[c]
-	arr[c] = arr[b]
-	arr[b] = arr[a]
-	arr[a] = temp
-}
-
-func performMultipleMoves(facelets *Facelets, moveNames []string) {
-	for _, moveName := range moveNames {
-		switch moveName {
-		case "U1":
-			U1(facelets)
-		case "U2":
-			U2(facelets)
-		case "U3":
-			U3(facelets)
-		case "F1":
-			F1(facelets)
-		case "F2":
-			F2(facelets)
-		case "F3":
-			F3(facelets)
-		case "D1":
-			D1(facelets)
-		case "D2":
-			D2(facelets)
-		case "D3":
-			D3(facelets)
-		case "B1":
-			B1(facelets)
-		case "B2":
-			B2(facelets)
-		case "B3":
-			B3(facelets)
-		case "L1":
-			L1(facelets)
-		case "L2":
-			L2(facelets)
-		case "L3":
-			L3(facelets)
-		case "R1":
-			R1(facelets)
-		case "R2":
-			R2(facelets)
-		case "R3":
-			R3(facelets)
-		}
-	}
 }
 
 func algString(forward []byte, inverse []byte) string {
@@ -181,219 +124,341 @@ func algString(forward []byte, inverse []byte) string {
 	return buff.String()
 }
 
-func PerformAlgorithm(facelets *Facelets, algorithm string) {
+func PerformAlgorithm(cube *Cube, algorithm string) {
 	for _, move := range strings.Split(algorithm, " ") {
 		switch move {
 		case "U":
-			U1(facelets)
+			U1(cube)
 		case "U2":
-			U2(facelets)
+			U2(cube)
 		case "U'":
-			U3(facelets)
+			U3(cube)
 		case "F":
-			F1(facelets)
+			F1(cube)
 		case "F2":
-			F2(facelets)
+			F2(cube)
 		case "F'":
-			F3(facelets)
+			F3(cube)
 		case "D":
-			D1(facelets)
+			D1(cube)
 		case "D2":
-			D2(facelets)
+			D2(cube)
 		case "D'":
-			D3(facelets)
+			D3(cube)
 		case "B":
-			B1(facelets)
+			B1(cube)
 		case "B2":
-			B2(facelets)
+			B2(cube)
 		case "B'":
-			B3(facelets)
+			B3(cube)
 		case "L":
-			L1(facelets)
+			L1(cube)
 		case "L2":
-			L2(facelets)
+			L2(cube)
 		case "L'":
-			L3(facelets)
+			L3(cube)
 		case "R":
-			R1(facelets)
+			R1(cube)
 		case "R2":
-			R2(facelets)
+			R2(cube)
 		case "R'":
-			R3(facelets)
+			R3(cube)
 		}
 	}
 }
 
-func U1(facelets *Facelets) {
-	swap4(facelets, 00, 05, 07, 02)
-	swap4(facelets, 01, 03, 06, 04)
-	swap4(facelets, 8, 32, 31, 40)
-	swap4(facelets, 11, 35, 28, 43)
-	swap4(facelets, 13, 37, 26, 45)
+// Twist a corner clockwise
+func twistCW(b byte) byte {
+	upper := b & 0xF0
+	lower := b & 0x0F
+	return ((upper+1)%3)<<4 | lower
 }
 
-func U2(facelets *Facelets) {
-	swap2(facelets, 00, 07)
-	swap2(facelets, 05, 02)
-	swap2(facelets, 01, 06)
-	swap2(facelets, 03, 04)
-	swap2(facelets, 8, 31)
-	swap2(facelets, 32, 40)
-	swap2(facelets, 11, 28)
-	swap2(facelets, 35, 43)
-	swap2(facelets, 13, 26)
-	swap2(facelets, 37, 45)
+// Twist a corner counter-clockwise
+func twistCCW(b byte) byte {
+	upper := b & 0xF0
+	lower := b & 0x0F
+	return ((upper+2)%3)<<4 | lower
+
 }
 
-func U3(facelets *Facelets) {
-	swap4(facelets, 00, 02, 07, 05)
-	swap4(facelets, 01, 04, 06, 03)
-	swap4(facelets, 8, 40, 31, 32)
-	swap4(facelets, 11, 43, 28, 35)
-	swap4(facelets, 13, 45, 26, 37)
+// Flip an edge
+func flip(b byte) byte {
+	return b ^ 0b00010000
 }
 
-func F1(facelets *Facelets) {
-	swap4(facelets, 8, 13, 15, 10)
-	swap4(facelets, 9, 11, 14, 12)
-	swap4(facelets, 02, 40, 21, 39)
-	swap4(facelets, 04, 41, 19, 38)
-	swap4(facelets, 07, 42, 16, 37)
+func U1(c *Cube) {
+	temp := c[0]
+	c[0] = c[2]
+	c[2] = c[3]
+	c[3] = c[1]
+	c[1] = temp
+
+	temp = c[8]
+	c[8] = c[9]
+	c[9] = c[11]
+	c[11] = c[10]
+	c[10] = temp
 }
 
-func F2(facelets *Facelets) {
-	swap2(facelets, 8, 15)
-	swap2(facelets, 13, 10)
-	swap2(facelets, 9, 14)
-	swap2(facelets, 11, 12)
-	swap2(facelets, 02, 21)
-	swap2(facelets, 40, 39)
-	swap2(facelets, 04, 19)
-	swap2(facelets, 41, 38)
-	swap2(facelets, 07, 16)
-	swap2(facelets, 42, 37)
+func U2(c *Cube) {
+	temp := c[0]
+	c[0] = c[3]
+	c[3] = temp
+
+	temp = c[1]
+	c[1] = c[2]
+	c[2] = temp
+
+	temp = c[8]
+	c[8] = c[11]
+	c[11] = temp
+
+	temp = c[9]
+	c[9] = c[10]
+	c[10] = temp
 }
 
-func F3(facelets *Facelets) {
-	swap4(facelets, 8, 10, 15, 13)
-	swap4(facelets, 9, 12, 14, 11)
-	swap4(facelets, 02, 39, 21, 40)
-	swap4(facelets, 04, 38, 19, 41)
-	swap4(facelets, 07, 37, 16, 42)
+func U3(c *Cube) {
+	temp := c[0]
+	c[0] = c[1]
+	c[1] = c[3]
+	c[3] = c[2]
+	c[2] = temp
+
+	temp = c[8]
+	c[8] = c[10]
+	c[10] = c[11]
+	c[11] = c[9]
+	c[9] = temp
 }
 
-func D1(facelets *Facelets) {
-	swap4(facelets, 16, 21, 23, 18)
-	swap4(facelets, 17, 19, 22, 20)
-	swap4(facelets, 10, 42, 29, 34)
-	swap4(facelets, 12, 44, 27, 36)
-	swap4(facelets, 15, 47, 24, 39)
+func F1(c *Cube) {
+	temp := c[2]
+	c[2] = twistCCW(c[4])
+	c[4] = twistCW(c[5])
+	c[5] = twistCCW(c[3])
+	c[3] = twistCW(temp)
+
+	temp = c[11]
+	c[11] = flip(c[12])
+	c[12] = flip(c[14])
+	c[14] = flip(c[13])
+	c[13] = flip(temp)
 }
 
-func D2(facelets *Facelets) {
-	swap2(facelets, 16, 23)
-	swap2(facelets, 21, 18)
-	swap2(facelets, 17, 22)
-	swap2(facelets, 19, 20)
-	swap2(facelets, 10, 29)
-	swap2(facelets, 42, 34)
-	swap2(facelets, 12, 27)
-	swap2(facelets, 44, 36)
-	swap2(facelets, 15, 24)
-	swap2(facelets, 47, 39)
+func F2(c *Cube) {
+	temp := c[2]
+	c[2] = c[5]
+	c[5] = temp
+
+	temp = c[3]
+	c[3] = c[4]
+	c[4] = temp
+
+	temp = c[11]
+	c[11] = c[14]
+	c[14] = temp
+
+	temp = c[12]
+	c[12] = c[13]
+	c[13] = temp
 }
 
-func D3(facelets *Facelets) {
-	swap4(facelets, 16, 18, 23, 21)
-	swap4(facelets, 17, 20, 22, 19)
-	swap4(facelets, 10, 34, 29, 42)
-	swap4(facelets, 12, 36, 27, 44)
-	swap4(facelets, 15, 39, 24, 47)
+func F3(c *Cube) {
+	temp := c[2]
+	c[2] = twistCCW(c[3])
+	c[3] = twistCW(c[5])
+	c[5] = twistCCW(c[4])
+	c[4] = twistCW(temp)
+
+	temp = c[11]
+	c[11] = flip(c[13])
+	c[13] = flip(c[14])
+	c[14] = flip(c[12])
+	c[12] = flip(temp)
 }
 
-func B1(facelets *Facelets) {
-	swap4(facelets, 24, 29, 31, 26)
-	swap4(facelets, 25, 27, 30, 28)
-	swap4(facelets, 00, 34, 23, 45)
-	swap4(facelets, 03, 33, 20, 46)
-	swap4(facelets, 05, 32, 18, 47)
+func D1(c *Cube) {
+	temp := c[4]
+	c[4] = c[6]
+	c[6] = c[7]
+	c[7] = c[5]
+	c[5] = temp
+
+	temp = c[14]
+	c[14] = c[15]
+	c[15] = c[17]
+	c[17] = c[16]
+	c[16] = temp
 }
 
-func B2(facelets *Facelets) {
-	swap2(facelets, 24, 31)
-	swap2(facelets, 29, 26)
-	swap2(facelets, 25, 30)
-	swap2(facelets, 27, 28)
-	swap2(facelets, 00, 23)
-	swap2(facelets, 34, 45)
-	swap2(facelets, 03, 20)
-	swap2(facelets, 33, 46)
-	swap2(facelets, 05, 18)
-	swap2(facelets, 32, 47)
+func D2(c *Cube) {
+	temp := c[4]
+	c[4] = c[7]
+	c[7] = temp
+
+	temp = c[5]
+	c[5] = c[6]
+	c[6] = temp
+
+	temp = c[14]
+	c[14] = c[17]
+	c[17] = temp
+
+	temp = c[15]
+	c[15] = c[16]
+	c[16] = temp
 }
 
-func B3(facelets *Facelets) {
-	swap4(facelets, 24, 26, 31, 29)
-	swap4(facelets, 25, 28, 30, 27)
-	swap4(facelets, 00, 45, 23, 34)
-	swap4(facelets, 03, 46, 20, 33)
-	swap4(facelets, 05, 47, 18, 32)
+func D3(c *Cube) {
+	temp := c[4]
+	c[4] = c[5]
+	c[5] = c[7]
+	c[7] = c[6]
+	c[6] = temp
+
+	temp = c[14]
+	c[14] = c[16]
+	c[16] = c[17]
+	c[17] = c[15]
+	c[15] = temp
 }
 
-func L1(facelets *Facelets) {
-	swap4(facelets, 32, 37, 39, 34)
-	swap4(facelets, 33, 35, 38, 36)
-	swap4(facelets, 26, 02, 10, 18)
-	swap4(facelets, 25, 01, 9, 17)
-	swap4(facelets, 24, 00, 8, 16)
+func B1(c *Cube) {
+	temp := c[0]
+	c[0] = twistCW(c[1])
+	c[1] = twistCCW(c[7])
+	c[7] = twistCW(c[6])
+	c[6] = twistCCW(temp)
+
+	temp = c[8]
+	c[8] = flip(c[19])
+	c[19] = flip(c[17])
+	c[17] = flip(c[18])
+	c[18] = flip(temp)
 }
 
-func L2(facelets *Facelets) {
-	swap2(facelets, 32, 39)
-	swap2(facelets, 37, 34)
-	swap2(facelets, 33, 38)
-	swap2(facelets, 35, 36)
-	swap2(facelets, 26, 10)
-	swap2(facelets, 02, 18)
-	swap2(facelets, 25, 9)
-	swap2(facelets, 01, 17)
-	swap2(facelets, 24, 8)
-	swap2(facelets, 00, 16)
+func B2(c *Cube) {
+	temp := c[0]
+	c[0] = c[7]
+	c[7] = temp
+
+	temp = c[1]
+	c[1] = c[6]
+	c[6] = temp
+
+	temp = c[8]
+	c[8] = c[17]
+	c[17] = temp
+
+	temp = c[19]
+	c[19] = c[18]
+	c[18] = temp
 }
 
-func L3(facelets *Facelets) {
-	swap4(facelets, 32, 34, 39, 37)
-	swap4(facelets, 33, 36, 38, 35)
-	swap4(facelets, 26, 18, 10, 02)
-	swap4(facelets, 25, 17, 9, 01)
-	swap4(facelets, 24, 16, 8, 00)
+func B3(c *Cube) {
+	temp := c[0]
+	c[0] = twistCW(c[6])
+	c[6] = twistCCW(c[7])
+	c[7] = twistCW(c[1])
+	c[1] = twistCCW(temp)
+
+	temp = c[8]
+	c[8] = flip(c[18])
+	c[18] = flip(c[17])
+	c[17] = flip(c[19])
+	c[19] = flip(temp)
 }
 
-func R1(facelets *Facelets) {
-	swap4(facelets, 40, 45, 47, 42)
-	swap4(facelets, 41, 43, 46, 44)
-	swap4(facelets, 05, 29, 21, 13)
-	swap4(facelets, 06, 30, 22, 14)
-	swap4(facelets, 07, 31, 23, 15)
+func L1(c *Cube) {
+	temp := c[0]
+	c[0] = twistCCW(c[6])
+	c[6] = twistCW(c[4])
+	c[4] = twistCCW(c[2])
+	c[2] = twistCW(temp)
+
+	temp = c[9]
+	c[9] = c[18]
+	c[18] = c[15]
+	c[15] = c[12]
+	c[12] = temp
 }
 
-func R2(facelets *Facelets) {
-	swap2(facelets, 40, 47)
-	swap2(facelets, 45, 42)
-	swap2(facelets, 41, 46)
-	swap2(facelets, 43, 44)
-	swap2(facelets, 05, 21)
-	swap2(facelets, 29, 13)
-	swap2(facelets, 06, 22)
-	swap2(facelets, 30, 14)
-	swap2(facelets, 07, 23)
-	swap2(facelets, 31, 15)
+func L2(c *Cube) {
+	temp := c[0]
+	c[0] = c[4]
+	c[4] = temp
+
+	temp = c[2]
+	c[2] = c[6]
+	c[6] = temp
+
+	temp = c[9]
+	c[9] = c[15]
+	c[15] = temp
+
+	temp = c[12]
+	c[12] = c[18]
+	c[18] = temp
 }
 
-func R3(facelets *Facelets) {
-	swap4(facelets, 40, 42, 47, 45)
-	swap4(facelets, 41, 44, 46, 43)
-	swap4(facelets, 05, 13, 21, 29)
-	swap4(facelets, 06, 14, 22, 30)
-	swap4(facelets, 07, 15, 23, 31)
+func L3(c *Cube) {
+	temp := c[0]
+	c[0] = twistCCW(c[2])
+	c[2] = twistCW(c[4])
+	c[4] = twistCCW(c[6])
+	c[6] = twistCW(temp)
+
+	temp = c[9]
+	c[9] = c[12]
+	c[12] = c[15]
+	c[15] = c[18]
+	c[18] = temp
+}
+
+func R1(c *Cube) {
+	temp := c[1]
+	c[1] = twistCW(c[3])
+	c[3] = twistCCW(c[5])
+	c[5] = twistCW(c[7])
+	c[7] = twistCCW(temp)
+
+	temp = c[10]
+	c[10] = c[13]
+	c[13] = c[16]
+	c[16] = c[19]
+	c[19] = temp
+}
+
+func R2(c *Cube) {
+	temp := c[1]
+	c[1] = c[5]
+	c[5] = temp
+
+	temp = c[3]
+	c[3] = c[7]
+	c[7] = temp
+
+	temp = c[10]
+	c[10] = c[16]
+	c[16] = temp
+
+	temp = c[13]
+	c[13] = c[19]
+	c[19] = temp
+}
+
+func R3(c *Cube) {
+	temp := c[1]
+	c[1] = twistCW(c[7])
+	c[7] = twistCCW(c[5])
+	c[5] = twistCW(c[3])
+	c[3] = twistCCW(temp)
+
+	temp = c[10]
+	c[10] = c[19]
+	c[19] = c[16]
+	c[16] = c[13]
+	c[13] = temp
 }

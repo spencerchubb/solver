@@ -1,18 +1,18 @@
 package solver
 
-type Moves []byte
-type Visited map[Facelets][]Moves
+type Algorithm []byte
+type Algorithms []Algorithm
 
-func add(visited Visited, facelets Facelets, moves Moves) {
-	visited[facelets] = append(visited[facelets], moves)
+type Visited map[Cube]Algorithms
+
+func add(visited Visited, cube Cube, alg Algorithm) {
+	visited[cube] = append(visited[cube], alg)
 }
 
-func get(visited Visited, facelets Facelets) []Moves {
-	return visited[facelets]
+func get(visited Visited, cube Cube) Algorithms {
+	return visited[cube]
 }
 
 func initVisited() Visited {
-	var m Visited
-	m = make(Visited)
-	return m
+	return make(Visited, 10_000_000)
 }

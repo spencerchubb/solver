@@ -1,6 +1,6 @@
 package solver
 
 type Node struct {
-	facelets Facelets
-	moves    []byte
+	cube  Cube
+	moves *[]byte
 }

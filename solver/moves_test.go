@@ -4,219 +4,243 @@ import (
 	"testing"
 )
 
-func assertFaceletsEq(t *testing.T, testName string, expected, actual Facelets) {
-	if !faceletsEq(expected, actual) {
-		t.Errorf("%s failed. Expected %s, got %s", testName, faceletsToStr(expected), faceletsToStr(actual))
+func assertByteEqual(t *testing.T, expected, actual byte) {
+	if expected != actual {
+		t.Errorf("Expected %v, got %v", expected, actual)
 	}
 }
 
-func TestU1(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	U1(&facelets)
-	expected := Facelets{U, U, U, U, U, U, U, U, R, F, F, R, F, R, F, F, D, D, D, D, D, D, D, D, B, B, L, B, L, B, B, L, F, L, L, F, L, F, L, L, B, R, R, B, R, B, R, R}
-	assertFaceletsEq(t, "TestU1", expected, facelets)
+func assertCubeEqual(t *testing.T, expected, actual Cube) {
+	if expected != actual {
+		t.Errorf("Expected %v, got %v", expected, actual)
+	}
 }
 
-func TestU2(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	U2(&facelets)
-	expected := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	U1(&expected)
-	U1(&expected)
-	assertFaceletsEq(t, "TestU2", expected, facelets)
+func TestTwistCW(t *testing.T) {
+	var b byte = 0b00001010
+	b = twistCW(b)
+	assertByteEqual(t, 0b00011010, b)
+
+	b = twistCW(b)
+	assertByteEqual(t, 0b00101010, b)
+
+	b = twistCW(b)
+	assertByteEqual(t, 0b00001010, b)
 }
 
-func TestU3(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	U3(&facelets)
-	expected := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	U1(&expected)
-	U1(&expected)
-	U1(&expected)
-	assertFaceletsEq(t, "TestU3", expected, facelets)
+func TestTwistCCW(t *testing.T) {
+	var b byte = 0b00001010
+	b = twistCCW(b)
+	assertByteEqual(t, 0b00101010, b)
 
+	b = twistCCW(b)
+	assertByteEqual(t, 0b00011010, b)
+
+	b = twistCCW(b)
+	assertByteEqual(t, 0b00001010, b)
 }
 
-func TestF1(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	F1(&facelets)
-	expected := Facelets{U, U, L, U, L, U, U, L, F, F, F, F, F, F, F, F, R, D, D, R, D, R, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, D, D, D, U, U, U, R, R, R, R, R}
-	assertFaceletsEq(t, "TestF1", expected, facelets)
+func TestFlip(t *testing.T) {
+	var b byte = 0b00001010
+	b = flip(b)
+	assertByteEqual(t, 0b00011010, b)
 
+	b = flip(b)
+	assertByteEqual(t, 0b00001010, b)
 }
 
-func TestF2(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	F2(&facelets)
-	expected := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	F1(&expected)
-	F1(&expected)
-	assertFaceletsEq(t, "TestF2", expected, facelets)
+func TestU(t *testing.T) {
+	c1 := NewCube()
+	c2 := NewCube()
 
+	U1(&c1)
+	U1(&c1)
+
+	U2(&c2)
+
+	assertCubeEqual(t, c1, c2)
+
+	U3(&c1)
+	U3(&c1)
+
+	U2(&c2)
+
+	assertCubeEqual(t, c1, c2)
 }
 
-func TestF3(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	F3(&facelets)
-	expected := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	F1(&expected)
-	F1(&expected)
-	F1(&expected)
-	assertFaceletsEq(t, "TestF3", expected, facelets)
+func TestF(t *testing.T) {
+	c1 := NewCube()
+	c2 := NewCube()
+
+	F1(&c1)
+	F1(&c1)
+
+	F2(&c2)
+
+	assertCubeEqual(t, c1, c2)
+
+	F3(&c1)
+	F3(&c1)
+
+	F2(&c2)
+
+	assertCubeEqual(t, c1, c2)
 }
 
-func TestD1(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	D1(&facelets)
-	expected := Facelets{U, U, U, U, U, U, U, U, F, F, L, F, L, F, F, L, D, D, D, D, D, D, D, D, R, B, B, R, B, R, B, B, L, L, B, L, B, L, L, B, R, R, F, R, F, R, R, F}
-	assertFaceletsEq(t, "TestD1", expected, facelets)
+func TestD(t *testing.T) {
+	c1 := NewCube()
+	c2 := NewCube()
+
+	D1(&c1)
+	D1(&c1)
+
+	D2(&c2)
+
+	assertCubeEqual(t, c1, c2)
+
+	D3(&c1)
+	D3(&c1)
+
+	D2(&c2)
+
+	assertCubeEqual(t, c1, c2)
 }
 
-func TestD2(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	D2(&facelets)
-	expected := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	D1(&expected)
-	D1(&expected)
-	assertFaceletsEq(t, "TestD2", expected, facelets)
+func TestB(t *testing.T) {
+	c1 := NewCube()
+	c2 := NewCube()
+
+	B1(&c1)
+	B1(&c1)
+
+	B2(&c2)
+
+	assertCubeEqual(t, c1, c2)
+
+	B3(&c1)
+	B3(&c1)
+
+	B2(&c2)
+
+	assertCubeEqual(t, c1, c2)
 }
 
-func TestD3(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	D3(&facelets)
-	expected := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	D1(&expected)
-	D1(&expected)
-	D1(&expected)
-	assertFaceletsEq(t, "TestD3", expected, facelets)
+func TestL(t *testing.T) {
+	c1 := NewCube()
+	c2 := NewCube()
+
+	L1(&c1)
+	L1(&c1)
+
+	L2(&c2)
+
+	assertCubeEqual(t, c1, c2)
+
+	L3(&c1)
+	L3(&c1)
+
+	L2(&c2)
+
+	assertCubeEqual(t, c1, c2)
 }
 
-func TestB1(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	B1(&facelets)
-	expected := Facelets{R, U, U, R, U, R, U, U, F, F, F, F, F, F, F, F, D, D, L, D, L, D, D, L, B, B, B, B, B, B, B, B, U, U, U, L, L, L, L, L, R, R, R, R, R, D, D, D}
-	assertFaceletsEq(t, "TestB1", expected, facelets)
+func TestR(t *testing.T) {
+	c1 := NewCube()
+	c2 := NewCube()
+
+	R1(&c1)
+	R1(&c1)
+
+	R2(&c2)
+
+	assertCubeEqual(t, c1, c2)
+
+	R3(&c1)
+	R3(&c1)
+
+	R2(&c2)
+
+	assertCubeEqual(t, c1, c2)
 }
 
-func TestB2(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	B2(&facelets)
-	expected := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	B1(&expected)
-	B1(&expected)
-	assertFaceletsEq(t, "TestB2", expected, facelets)
+func TestRU(t *testing.T) {
+	c1 := NewCube()
+	c2 := NewCube()
+
+	for i := 0; i < 6; i++ {
+		PerformAlgorithm(&c1, "R U R' U'")
+	}
+
+	assertCubeEqual(t, c1, c2)
 }
 
-func TestB3(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	B3(&facelets)
-	expected := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	B1(&expected)
-	B1(&expected)
-	B1(&expected)
-	assertFaceletsEq(t, "TestB3", expected, facelets)
+func TestFL(t *testing.T) {
+	c1 := NewCube()
+	c2 := NewCube()
+
+	for i := 0; i < 6; i++ {
+		PerformAlgorithm(&c1, "F L F' L'")
+	}
+
+	assertCubeEqual(t, c1, c2)
 }
 
-func TestL1(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	L1(&facelets)
-	expected := Facelets{B, B, B, U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	assertFaceletsEq(t, "TestL1", expected, facelets)
+func TestBD(t *testing.T) {
+	c1 := NewCube()
+	c2 := NewCube()
+
+	for i := 0; i < 6; i++ {
+		B1(&c1)
+		D1(&c1)
+		B3(&c1)
+		D3(&c1)
+	}
+
+	assertCubeEqual(t, c1, c2)
 }
 
-func TestL2(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	L2(&facelets)
-	expected := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	L1(&expected)
-	L1(&expected)
-	assertFaceletsEq(t, "TestL2", expected, facelets)
+func TestSome(t *testing.T) {
+	c1 := NewCube()
+	c2 := NewCube()
+
+	PerformAlgorithm(&c1, "U F D B L R R' L' B' D' F' U'")
+
+	assertCubeEqual(t, c1, c2)
 }
 
-func TestL3(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	L3(&facelets)
-	expected := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	L1(&expected)
-	L1(&expected)
-	L1(&expected)
-	assertFaceletsEq(t, "TestL3", expected, facelets)
+func TestMore(t *testing.T) {
+	c1 := NewCube()
+	c2 := NewCube()
+
+	PerformAlgorithm(&c1, "F R U R' U' F' U2 B U L U' L' B' U2")
+
+	assertCubeEqual(t, c1, c2)
 }
 
-func TestR1(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	R1(&facelets)
-	expected := Facelets{U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, U, U, U, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	assertFaceletsEq(t, "TestR1", expected, facelets)
-}
+func TestRandom(t *testing.T) {
+	c1 := NewCube()
+	c2 := NewCube()
 
-func TestR2(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	R2(&facelets)
-	expected := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	R1(&expected)
-	R1(&expected)
-	assertFaceletsEq(t, "TestR2", expected, facelets)
-}
+	// Scramble
+	PerformAlgorithm(&c1, "R F B2 U2 B' L' D F' B L2 D2 R2 U R' D' F2 U' L")
 
-func TestR3(t *testing.T) {
-	facelets := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	R3(&facelets)
-	expected := Facelets{U, U, U, U, U, U, U, U, F, F, F, F, F, F, F, F, D, D, D, D, D, D, D, D, B, B, B, B, B, B, B, B, L, L, L, L, L, L, L, L, R, R, R, R, R, R, R, R}
-	R1(&expected)
-	R1(&expected)
-	R1(&expected)
-	assertFaceletsEq(t, "TestR3", expected, facelets)
-}
+	// Cross
+	PerformAlgorithm(&c1, "R D2 L2")
 
-func TestMultiple(t *testing.T) {
-	facelets := SolvedFacelets()
-	U1(&facelets)
-	F1(&facelets)
-	D1(&facelets)
-	expected := Facelets{U, U, L, U, L, U, U, F, F, F, L, F, L, R, R, D, D, D, D, D, D, R, R, B, R, B, L, R, L, U, B, L, F, L, B, F, B, D, D, B, U, U, F, B, F, B, R, R}
-	assertFaceletsEq(t, "TestMultiple A", expected, facelets)
-	B1(&facelets)
-	L1(&facelets)
-	R1(&facelets)
-	expected = Facelets{L, L, L, R, L, R, R, D, B, U, L, F, L, R, R, B, F, F, L, D, L, R, R, U, D, D, F, B, B, R, U, F, U, B, B, U, D, U, F, D, F, F, D, U, D, U, B, B}
-	assertFaceletsEq(t, "TestMultiple B", expected, facelets)
-	F1(&facelets)
-	L1(&facelets)
-	B1(&facelets)
-	expected = Facelets{U, D, F, B, F, B, R, U, L, L, D, U, R, B, F, R, L, L, B, F, D, F, R, R, L, B, F, F, U, D, B, R, R, R, D, B, D, U, U, F, L, L, D, U, D, U, L, B}
-	assertFaceletsEq(t, "TestMultiple C", expected, facelets)
-	U1(&facelets)
-	R1(&facelets)
-	D1(&facelets)
-	expected = Facelets{F, F, U, D, R, U, F, R, L, L, D, U, D, F, R, F, B, D, R, L, B, L, F, D, F, B, U, L, B, B, B, B, L, R, U, U, F, B, U, L, D, D, D, L, R, R, U, R}
-	assertFaceletsEq(t, "TestMultiple D", expected, facelets)
-}
+	// Pair 1
+	PerformAlgorithm(&c1, "D F D' F' D F' D2 F")
 
-func TestAll(t *testing.T) {
-	facelets := SolvedFacelets()
-	U1(&facelets)
-	F1(&facelets)
-	D1(&facelets)
-	B1(&facelets)
-	L1(&facelets)
-	R1(&facelets)
-	expected := Facelets{L, L, L, R, L, R, R, D, B, U, L, F, L, R, R, B, F, F, L, D, L, R, R, U, D, D, F, B, B, R, U, F, U, B, B, U, D, U, F, D, F, F, D, U, D, U, B, B}
-	assertFaceletsEq(t, "TestAll A", expected, facelets)
-	U2(&facelets)
-	F2(&facelets)
-	D2(&facelets)
-	B2(&facelets)
-	L2(&facelets)
-	R2(&facelets)
-	expected = Facelets{U, R, L, R, D, L, F, D, B, U, F, L, B, R, D, F, L, R, R, L, L, R, L, F, B, R, R, F, B, L, U, D, B, F, D, D, U, U, B, U, F, B, U, D, U, B, F, D}
-	assertFaceletsEq(t, "TestAll B", expected, facelets)
-	U3(&facelets)
-	F3(&facelets)
-	D3(&facelets)
-	B3(&facelets)
-	L3(&facelets)
-	R3(&facelets)
-	expected = Facelets{U, D, L, F, B, F, D, B, U, B, B, D, U, D, D, U, D, U, U, L, F, F, B, D, B, R, B, U, R, F, L, R, L, B, R, R, R, F, U, R, L, L, R, F, L, D, F, L}
-	assertFaceletsEq(t, "TestAll C", expected, facelets)
+	// Pair 2
+	PerformAlgorithm(&c1, "D2 R' D R")
+
+	// Pair 3+4
+	PerformAlgorithm(&c1, "L' D' L D' B D B2 D' B D' R D R'")
+
+	// OLL
+	PerformAlgorithm(&c1, "B' D' L' D L B")
+
+	// PLL
+	PerformAlgorithm(&c1, "R D R' D R D R' B' R D R' D' R' B R2 D' R' D2 R D' R'")
+
+	assertCubeEqual(t, c1, c2)
 }

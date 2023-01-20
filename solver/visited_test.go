@@ -2,28 +2,39 @@ package solver
 
 import "testing"
 
-func TestAdd(t *testing.T) {
-	visited := initVisited()
-	add(visited, [48]Facelet{0, 1, 2, 3}, []byte{'U'})
-	add(visited, [48]Facelet{0, 1, 2, 3}, []byte{'F'})
-	add(visited, [48]Facelet{4, 5, 6, 7}, []byte{'D'})
+func assertAlgsEqual(t *testing.T, expected, actual Algorithms) {
+	if len(expected) != len(actual) {
+		t.Errorf("Expected %d algorithms, got %d", len(expected), len(actual))
+	}
 
-	movesArray := get(visited, [48]Facelet{0, 1, 2, 3})
+	for i := 0; i < len(expected); i++ {
+		if len(expected[i]) != len(actual[i]) {
+			t.Errorf("Expected %d moves, got %d", len(expected[i]), len(actual[i]))
+		}
+		for j := 0; j < len(expected[i]); j++ {
+			if expected[i][j] != actual[i][j] {
+				t.Errorf("Expected %v, got %v", expected, actual)
+
+			}
+		}
+	}
+}
+
+func TestAdd(t *testing.T) {
+	c1 := Cube{0, 1, 2, 3}
+	c2 := Cube{2, 3, 4, 5}
+
+	visited := initVisited()
+	add(visited, c1, Algorithm{0})
+	add(visited, c1, Algorithm{3})
+	add(visited, c2, Algorithm{6})
+
+	movesArray := get(visited, c1)
 	if len(movesArray) != 2 {
 		t.Errorf("Expected 2 moves, got %d", len(movesArray))
 	}
-	if movesArray[0][0] != 'U' {
-		t.Errorf("Expected U, got %b", movesArray[0][0])
-	}
-	if movesArray[1][0] != 'F' {
-		t.Errorf("Expected F, got %b", movesArray[1][0])
-	}
+	assertAlgsEqual(t, movesArray, Algorithms{Algorithm{0}, Algorithm{3}})
 
-	movesArray = get(visited, [48]Facelet{4, 5, 6, 7})
-	if len(movesArray) != 1 {
-		t.Errorf("Expected 1 move, got %d", len(movesArray))
-	}
-	if movesArray[0][0] != 'D' {
-		t.Errorf("Expected D, got %b", movesArray[0][0])
-	}
+	movesArray = get(visited, c2)
+	assertAlgsEqual(t, movesArray, Algorithms{Algorithm{6}})
 }
