@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
-	"solver"
 	"strconv"
 	"time"
+
+	"github.com/spencerchubb/solver"
 )
 
 const KEY_SCRAMBLE = "-scramble"

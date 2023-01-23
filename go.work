@@ -1,3 +1,1 @@
 go 1.19
-
-use ./solver

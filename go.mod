@@ -1,3 +1,3 @@
-module main
+module solver
 
 go 1.19
