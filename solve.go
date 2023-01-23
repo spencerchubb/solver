@@ -4,8 +4,10 @@ import (
 	"fmt"
 )
 
-func lastMoveSameFace(moves []byte, move byte) bool {
-	// If there are no moves in the array, there is no last move
+var oppositeFaces = []byte{2, 3, 0, 1, 5, 4}
+
+func sameFace(moves []byte, move byte) bool {
+	// If there are no moves in the array, there is no last move.
 	if len(moves) == 0 {
 		return false
 	}
@@ -15,7 +17,19 @@ func lastMoveSameFace(moves []byte, move byte) bool {
 	// If the moves are on the same face, then these should be equal.
 	// e.g. U1 is associated with 0x00, and U3 is associated with 0x02.
 	// With integer division, 0x00/3 is 0, and 0x02/3 is 0.
-	return lastMove/3 == move/3
+	if lastMove/3 == move/3 {
+		return true
+	}
+
+	// If there is only one move in the array, there is no second-to-last move.
+	if len(moves) == 1 {
+		return false
+	}
+
+	secondLastMove := moves[len(moves)-2]
+
+	// Returns true if the last move is on the opposite face AND the second-to-last move is on the same face.
+	return move/3 == oppositeFaces[lastMove/3] && move/3 == secondLastMove/3
 }
 
 func Solve(cube Cube, moves []int, maxSolutions int, log bool) []string {
@@ -38,36 +52,14 @@ func Solve(cube Cube, moves []int, maxSolutions int, log bool) []string {
 		inverseNode := inverseQueue[0]
 		inverseQueue = inverseQueue[1:]
 
-		algs := get(visited, inverseNode.cube)
-		for _, alg := range algs {
-			algStr := algString(alg, *inverseNode.moves)
-			if solutionExists[algStr] {
-				continue
-			}
-			if log {
-				fmt.Println(algStr)
-			}
-			solutionExists[algStr] = true
-			solutions = append(solutions, algStr)
-			if len(solutions) >= maxSolutions {
-				return solutions
-			}
+		results := check(inverseNode, visited, &solutions, solutionExists, maxSolutions, log)
+		if results != nil {
+			return *results
 		}
 
-		inverseAlgs := get(inverseVisited, node.cube)
-		for _, inverseAlg := range inverseAlgs {
-			algStr := algString(*node.moves, inverseAlg)
-			if solutionExists[algStr] {
-				continue
-			}
-			if log {
-				fmt.Println(algStr)
-			}
-			solutionExists[algStr] = true
-			solutions = append(solutions, algStr)
-			if len(solutions) >= maxSolutions {
-				return solutions
-			}
+		results = check(node, inverseVisited, &solutions, solutionExists, maxSolutions, log)
+		if results != nil {
+			return *results
 		}
 
 		if log && len(*node.moves) > depth {
@@ -81,22 +73,38 @@ func Solve(cube Cube, moves []int, maxSolutions int, log bool) []string {
 		}
 
 		for _, move := range moves {
-			if !lastMoveSameFace(*node.moves, moveAliases[move]) {
-				cpy := node.cube
-				allMoves[move](&cpy)
-				newMoves := appendImmutable(*node.moves, moveAliases[move])
-				queue = append(queue, &Node{cpy, &newMoves})
-
-				add(visited, cpy, newMoves)
-			}
-			if !lastMoveSameFace(*inverseNode.moves, moveAliases[move]) {
-				cpy := inverseNode.cube
-				allMoves[move](&cpy)
-				newMoves := appendImmutable(*inverseNode.moves, moveAliases[move])
-				inverseQueue = append(inverseQueue, &Node{cpy, &newMoves})
-
-				add(inverseVisited, cpy, newMoves)
-			}
+			goToChild(&queue, node, visited, move)
+			goToChild(&inverseQueue, inverseNode, inverseVisited, move)
 		}
+	}
+}
+
+func check(node *Node, visited Visited, solutions *[]string, solutionExists map[string]bool, maxSolutions int, log bool) *[]string {
+	algs := get(visited, node.cube)
+	for _, alg := range algs {
+		algStr := algString(alg, *node.moves)
+		if solutionExists[algStr] {
+			continue
+		}
+		if log {
+			fmt.Println(algStr)
+		}
+		solutionExists[algStr] = true
+		*solutions = append(*solutions, algStr)
+		if len(*solutions) >= maxSolutions {
+			return solutions
+		}
+	}
+	return nil
+}
+
+func goToChild(queue *[]*Node, node *Node, visited Visited, move int) {
+	if !sameFace(*node.moves, moveAliases[move]) {
+		cpy := node.cube
+		allMoves[move](&cpy)
+		newMoves := appendImmutable(*node.moves, moveAliases[move])
+		*queue = append(*queue, &Node{cpy, &newMoves})
+
+		add(visited, cpy, newMoves)
 	}
 }
