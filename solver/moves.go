@@ -1,7 +1,6 @@
 package solver
 
 import (
-	"bytes"
 	"strings"
 )
 
@@ -14,6 +13,34 @@ import (
 //          04 14 05
 //          15    16
 //          06 17 07
+
+const U1Num = 0
+const U2Num = 1
+const U3Num = 2
+const F1Num = 3
+const F2Num = 4
+const F3Num = 5
+const D1Num = 6
+const D2Num = 7
+const D3Num = 8
+const B1Num = 9
+const B2Num = 10
+const B3Num = 11
+const L1Num = 12
+const L2Num = 13
+const L3Num = 14
+const R1Num = 15
+const R2Num = 16
+const R3Num = 17
+
+var inverseMoveNums = []byte{
+	U3Num, U2Num, U1Num,
+	F3Num, F2Num, F1Num,
+	D3Num, D2Num, D1Num,
+	B3Num, B2Num, B1Num,
+	L3Num, L2Num, L1Num,
+	R3Num, R2Num, R1Num,
+}
 
 var moveAliases = []byte{
 	0x00,
@@ -99,29 +126,87 @@ var allMoves = []func(*Cube){
 	R3,
 }
 
+func invertMove(move byte) byte {
+	return inverseMoveNums[move]
+}
+
+func invertMoves(moves []byte) []byte {
+	out := make([]byte, len(moves))
+	for i, move := range moves {
+		out[len(moves)-i-1] = inverseMoveNums[move]
+	}
+	return out
+}
+
+var equivalences = [][]byte{
+	{U2Num, U3Num, 0},
+	{U3Num, 0, U1Num},
+	{0, U1Num, U2Num},
+	{F2Num, F3Num, 0},
+	{F3Num, 0, F1Num},
+	{0, F1Num, F2Num},
+	{D2Num, D3Num, 0},
+	{D3Num, 0, D1Num},
+	{0, D1Num, D2Num},
+	{B2Num, B3Num, 0},
+	{B3Num, 0, B1Num},
+	{0, B1Num, B2Num},
+	{L2Num, L3Num, 0},
+	{L3Num, 0, L1Num},
+	{0, L1Num, L2Num},
+	{R2Num, R3Num, 0},
+	{R3Num, 0, R1Num},
+	{0, R1Num, R2Num},
+}
+
+// Returns 0xFF if the moves cannot be canceled.
+// Returns 0 if the moves perfectly cancel.
+// Returns the move that remains if the moves can be simplified.
+// For example, U1 and U2 can simplify to U3.
+func cancelPairOfMoves(m1, m2 byte) byte {
+	face1 := m1 / 3
+	face2 := m2 / 3
+	if face1 != face2 {
+		return 0xFF
+	}
+	return equivalences[m1][m2%3]
+}
+
+func cancelMoves(moves []byte) []byte {
+	out := make([]byte, 0, len(moves))
+	for _, move := range moves {
+		if len(out) > 0 && out[len(out)-1] == inverseMoveNums[move] {
+			out = out[:len(out)-1]
+		} else {
+			out = append(out, move)
+		}
+	}
+	return out
+}
+
 func algString(forward []byte, inverse []byte) string {
-	buff := bytes.NewBufferString("")
-	inverseHasMoves := len(inverse) > 0
-	for i := 0; i < len(forward); i++ {
-		move := forward[i]
-		name := moveNames[move]
-		buff.WriteString(name)
-
-		// Don't add a space after the last move if there are no inverse moves
-		if i < len(forward)-1 || inverseHasMoves {
-			buff.WriteByte(' ')
+	inverted := invertMoves(inverse)
+	combined := appendImmutable(forward, inverted...)
+	cleaned := make([]byte, 0, len(combined))
+	for _, move := range combined {
+		if len(cleaned) > 0 {
+			cancel := cancelPairOfMoves(cleaned[len(cleaned)-1], move)
+			if cancel == 0xFF {
+				cleaned = append(cleaned, move)
+			} else if cancel == 0 {
+				cleaned = cleaned[:len(cleaned)-1]
+			} else {
+				cleaned[len(cleaned)-1] = cancel
+			}
+		} else {
+			cleaned = append(cleaned, move)
 		}
 	}
-	for i := len(inverse) - 1; i >= 0; i-- {
-		move := inverse[i]
-		name := inverseMoveNames[move]
-		buff.WriteString(name)
-
-		if i > 0 {
-			buff.WriteByte(' ')
-		}
+	movesAsStrings := make([]string, len(cleaned))
+	for i, m := range cleaned {
+		movesAsStrings[i] = moveNames[m]
 	}
-	return buff.String()
+	return strings.Join(movesAsStrings, " ")
 }
 
 func PerformAlgorithm(cube *Cube, algorithm string) {

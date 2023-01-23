@@ -29,6 +29,7 @@ func Solve(cube Cube, moves []int, maxSolutions int, log bool) []string {
 	queue := []*Node{{cube, &[]byte{}}}
 	inverseQueue := []*Node{{NewCube(), &[]byte{}}}
 
+	solutionExists := make(map[string]bool)
 	var solutions []string
 	for loc := 0; ; loc++ {
 		node := queue[0]
@@ -40,9 +41,13 @@ func Solve(cube Cube, moves []int, maxSolutions int, log bool) []string {
 		algs := get(visited, inverseNode.cube)
 		for _, alg := range algs {
 			algStr := algString(alg, *inverseNode.moves)
+			if solutionExists[algStr] {
+				continue
+			}
 			if log {
 				fmt.Println(algStr)
 			}
+			solutionExists[algStr] = true
 			solutions = append(solutions, algStr)
 			if len(solutions) >= maxSolutions {
 				return solutions
@@ -52,9 +57,13 @@ func Solve(cube Cube, moves []int, maxSolutions int, log bool) []string {
 		inverseAlgs := get(inverseVisited, node.cube)
 		for _, inverseAlg := range inverseAlgs {
 			algStr := algString(*node.moves, inverseAlg)
+			if solutionExists[algStr] {
+				continue
+			}
 			if log {
 				fmt.Println(algStr)
 			}
+			solutionExists[algStr] = true
 			solutions = append(solutions, algStr)
 			if len(solutions) >= maxSolutions {
 				return solutions

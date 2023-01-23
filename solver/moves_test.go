@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func assertByteEqual(t *testing.T, expected, actual byte) {
+func assertEqual[T comparable](t *testing.T, expected, actual T) {
 	if expected != actual {
 		t.Errorf("Expected %v, got %v", expected, actual)
 	}
@@ -16,37 +16,107 @@ func assertCubeEqual(t *testing.T, expected, actual Cube) {
 	}
 }
 
+func TestInvertMove(t *testing.T) {
+	assertEqual(t, U1Num, invertMove(U3Num))
+	assertEqual(t, U2Num, invertMove(U2Num))
+	assertEqual(t, U3Num, invertMove(U1Num))
+	assertEqual(t, F1Num, invertMove(F3Num))
+	assertEqual(t, F2Num, invertMove(F2Num))
+	assertEqual(t, F3Num, invertMove(F1Num))
+	assertEqual(t, D1Num, invertMove(D3Num))
+	assertEqual(t, D2Num, invertMove(D2Num))
+	assertEqual(t, D3Num, invertMove(D1Num))
+	assertEqual(t, B1Num, invertMove(B3Num))
+	assertEqual(t, B2Num, invertMove(B2Num))
+	assertEqual(t, B3Num, invertMove(B1Num))
+	assertEqual(t, L1Num, invertMove(L3Num))
+	assertEqual(t, L2Num, invertMove(L2Num))
+	assertEqual(t, L3Num, invertMove(L1Num))
+	assertEqual(t, R1Num, invertMove(R3Num))
+	assertEqual(t, R2Num, invertMove(R2Num))
+	assertEqual(t, R3Num, invertMove(R1Num))
+}
+
+func TestInvertMoves(t *testing.T) {
+	moves := []byte{
+		U1Num, U2Num, U3Num,
+		F1Num, F2Num, F3Num,
+		D1Num, D2Num, D3Num,
+		B1Num, B2Num, B3Num,
+		L1Num, L2Num, L3Num,
+		R1Num, R2Num, R3Num,
+	}
+	moves = invertMoves(moves)
+	expected := []byte{
+		R1Num, R2Num, R3Num,
+		L1Num, L2Num, L3Num,
+		B1Num, B2Num, B3Num,
+		D1Num, D2Num, D3Num,
+		F1Num, F2Num, F3Num,
+		U1Num, U2Num, U3Num,
+	}
+	for i := range moves {
+		assertEqual(t, expected[i], moves[i])
+	}
+}
+
+func TestCancelPairOfMoves(t *testing.T) {
+	assertEqual(t, 0xFF, cancelPairOfMoves(U1Num, F1Num))
+	assertEqual(t, 0x00, cancelPairOfMoves(F1Num, F3Num))
+	assertEqual(t, 0x00, cancelPairOfMoves(F2Num, F2Num))
+	assertEqual(t, F1Num, cancelPairOfMoves(F2Num, F3Num))
+	assertEqual(t, F2Num, cancelPairOfMoves(F1Num, F1Num))
+	assertEqual(t, F3Num, cancelPairOfMoves(F1Num, F2Num))
+}
+
+func TestAlgString(t *testing.T) {
+	// Basic case with no cancellations
+	forward := []byte{R1Num, U1Num, R3Num, U3Num}
+	inverse := []byte{U1Num, R1Num, U3Num, R3Num}
+	assertEqual(t, "R U R' U' R U R' U'", algString(forward, inverse))
+
+	// One cancellation
+	forward = []byte{R1Num, U1Num, R3Num, U3Num}
+	inverse = []byte{F3Num, U1Num, F1Num, U3Num}
+	assertEqual(t, "R U R' F' U' F", algString(forward, inverse))
+
+	// Several cancellations
+	forward = []byte{R1Num, U1Num, R3Num, U1Num, R1Num, U2Num, R3Num}
+	inverse = []byte{R1Num, U2Num, R3Num, U3Num, R1Num, U3Num, R3Num}
+	assertEqual(t, "R U R' U R U' R' U R U2 R'", algString(forward, inverse))
+}
+
 func TestTwistCW(t *testing.T) {
 	var b byte = 0b00001010
 	b = twistCW(b)
-	assertByteEqual(t, 0b00011010, b)
+	assertEqual(t, 0b00011010, b)
 
 	b = twistCW(b)
-	assertByteEqual(t, 0b00101010, b)
+	assertEqual(t, 0b00101010, b)
 
 	b = twistCW(b)
-	assertByteEqual(t, 0b00001010, b)
+	assertEqual(t, 0b00001010, b)
 }
 
 func TestTwistCCW(t *testing.T) {
 	var b byte = 0b00001010
 	b = twistCCW(b)
-	assertByteEqual(t, 0b00101010, b)
+	assertEqual(t, 0b00101010, b)
 
 	b = twistCCW(b)
-	assertByteEqual(t, 0b00011010, b)
+	assertEqual(t, 0b00011010, b)
 
 	b = twistCCW(b)
-	assertByteEqual(t, 0b00001010, b)
+	assertEqual(t, 0b00001010, b)
 }
 
 func TestFlip(t *testing.T) {
 	var b byte = 0b00001010
 	b = flip(b)
-	assertByteEqual(t, 0b00011010, b)
+	assertEqual(t, 0b00011010, b)
 
 	b = flip(b)
-	assertByteEqual(t, 0b00001010, b)
+	assertEqual(t, 0b00001010, b)
 }
 
 func TestU(t *testing.T) {
