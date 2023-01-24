@@ -2,6 +2,7 @@ package solver
 
 import (
 	"fmt"
+	"time"
 )
 
 var oppositeFaces = []byte{2, 3, 0, 1, 5, 4}
@@ -32,7 +33,7 @@ func sameFace(moves []byte, move byte) bool {
 	return move/3 == oppositeFaces[lastMove/3] && move/3 == secondLastMove/3
 }
 
-func Solve(cube Cube, moves []int, maxSolutions int, log bool) []string {
+func Solve(cube Cube, moves []int, maxSolutions int, maxMs int64, log bool) []string {
 	depth := 0
 	inverseDepth := 0
 
@@ -45,7 +46,13 @@ func Solve(cube Cube, moves []int, maxSolutions int, log bool) []string {
 
 	solutionExists := make(map[string]bool)
 	var solutions []string
+	var msElapsed = time.Now().UnixMilli()
 	for loc := 0; ; loc++ {
+		msElapsed = time.Now().UnixMilli() - msElapsed
+		if msElapsed > maxMs {
+			return solutions
+		}
+
 		node := queue[0]
 		queue = queue[1:]
 

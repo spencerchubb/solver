@@ -11,7 +11,7 @@ func TestSolve(t *testing.T) {
 
 	moves := []int{0, 1, 2, 3, 4, 5, 15, 16, 17}
 
-	solutions := Solve(cube, moves, 10, false)
+	solutions := Solve(cube, moves, 10, 10_000, false)
 	for _, solution := range solutions {
 		fmt.Println(solution)
 	}

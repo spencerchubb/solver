@@ -77,7 +77,7 @@ func main() {
 
 	startTime := time.Now()
 
-	solver.Solve(cube, moves, maxSolutions, true)
+	solver.Solve(cube, moves, maxSolutions, 60_000, true)
 
 	endTime := time.Now()
 	fmt.Printf("Time: %v", endTime.Sub(startTime))
