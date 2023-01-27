@@ -46,10 +46,10 @@ func Solve(cube Cube, moves []int, maxSolutions int, maxMs int64, log bool) []st
 
 	solutionExists := make(map[string]bool)
 	var solutions []string
-	var msElapsed = time.Now().UnixMilli()
+	var startMs = time.Now().UnixMilli()
 	for loc := 0; ; loc++ {
-		msElapsed = time.Now().UnixMilli() - msElapsed
-		if msElapsed > maxMs {
+		elapsedMs := time.Now().UnixMilli() - startMs
+		if elapsedMs > maxMs {
 			return solutions
 		}
 
@@ -59,12 +59,12 @@ func Solve(cube Cube, moves []int, maxSolutions int, maxMs int64, log bool) []st
 		inverseNode := inverseQueue[0]
 		inverseQueue = inverseQueue[1:]
 
-		results := check(inverseNode, visited, &solutions, solutionExists, maxSolutions, log)
+		results := check(inverseNode, visited, &solutions, &solutionExists, maxSolutions, log)
 		if results != nil {
 			return *results
 		}
 
-		results = check(node, inverseVisited, &solutions, solutionExists, maxSolutions, log)
+		results = check(node, inverseVisited, &solutions, &solutionExists, maxSolutions, log)
 		if results != nil {
 			return *results
 		}
@@ -86,17 +86,17 @@ func Solve(cube Cube, moves []int, maxSolutions int, maxMs int64, log bool) []st
 	}
 }
 
-func check(node *Node, visited Visited, solutions *[]string, solutionExists map[string]bool, maxSolutions int, log bool) *[]string {
+func check(node *Node, visited Visited, solutions *[]string, solutionExists *map[string]bool, maxSolutions int, log bool) *[]string {
 	algs := get(visited, node.cube)
 	for _, alg := range algs {
 		algStr := algString(alg, *node.moves)
-		if solutionExists[algStr] {
+		if (*solutionExists)[algStr] {
 			continue
 		}
 		if log {
 			fmt.Println(algStr)
 		}
-		solutionExists[algStr] = true
+		(*solutionExists)[algStr] = true
 		*solutions = append(*solutions, algStr)
 		if len(*solutions) >= maxSolutions {
 			return solutions

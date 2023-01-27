@@ -4,17 +4,6 @@ import (
 	"testing"
 )
 
-func assertEqual[T comparable](t *testing.T, expected, actual T) {
-	if expected != actual {
-		t.Errorf("Expected %v, got %v", expected, actual)
-	}
-}
-
-func assertCubeEqual(t *testing.T, expected, actual Cube) {
-	if expected != actual {
-		t.Errorf("Expected %v, got %v", expected, actual)
-	}
-}
 
 func TestInvertMove(t *testing.T) {
 	assertEqual(t, U1Num, invertMove(U3Num))
@@ -61,9 +50,9 @@ func TestInvertMoves(t *testing.T) {
 }
 
 func TestCancelPairOfMoves(t *testing.T) {
-	assertEqual(t, 0xFF, cancelPairOfMoves(U1Num, F1Num))
-	assertEqual(t, 0x00, cancelPairOfMoves(F1Num, F3Num))
-	assertEqual(t, 0x00, cancelPairOfMoves(F2Num, F2Num))
+	assertEqual(t, noCancel, cancelPairOfMoves(U1Num, F1Num))
+	assertEqual(t, perfectCancel, cancelPairOfMoves(F1Num, F3Num))
+	assertEqual(t, perfectCancel, cancelPairOfMoves(F2Num, F2Num))
 	assertEqual(t, F1Num, cancelPairOfMoves(F2Num, F3Num))
 	assertEqual(t, F2Num, cancelPairOfMoves(F1Num, F1Num))
 	assertEqual(t, F3Num, cancelPairOfMoves(F1Num, F2Num))
@@ -84,6 +73,11 @@ func TestAlgString(t *testing.T) {
 	forward = []byte{R1Num, U1Num, R3Num, U1Num, R1Num, U2Num, R3Num}
 	inverse = []byte{R1Num, U2Num, R3Num, U3Num, R1Num, U3Num, R3Num}
 	assertEqual(t, "R U R' U R U' R' U R U2 R'", algString(forward, inverse))
+
+	// U2 and U' simplify to U
+	forward = []byte{U1Num, R1Num, U1Num, F3Num, R3Num, F1Num, U2Num}
+	inverse = []byte{R1Num, U2Num, F3Num, R3Num, F1Num, U1Num}
+	assertEqual(t, "U R U F' R' F U F' R F U2 R'", algString(forward, inverse))
 }
 
 func TestTwistCW(t *testing.T) {
@@ -128,14 +122,14 @@ func TestU(t *testing.T) {
 
 	U2(&c2)
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 
 	U3(&c1)
 	U3(&c1)
 
 	U2(&c2)
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 }
 
 func TestF(t *testing.T) {
@@ -147,14 +141,14 @@ func TestF(t *testing.T) {
 
 	F2(&c2)
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 
 	F3(&c1)
 	F3(&c1)
 
 	F2(&c2)
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 }
 
 func TestD(t *testing.T) {
@@ -166,14 +160,14 @@ func TestD(t *testing.T) {
 
 	D2(&c2)
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 
 	D3(&c1)
 	D3(&c1)
 
 	D2(&c2)
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 }
 
 func TestB(t *testing.T) {
@@ -185,14 +179,14 @@ func TestB(t *testing.T) {
 
 	B2(&c2)
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 
 	B3(&c1)
 	B3(&c1)
 
 	B2(&c2)
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 }
 
 func TestL(t *testing.T) {
@@ -204,14 +198,14 @@ func TestL(t *testing.T) {
 
 	L2(&c2)
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 
 	L3(&c1)
 	L3(&c1)
 
 	L2(&c2)
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 }
 
 func TestR(t *testing.T) {
@@ -223,14 +217,14 @@ func TestR(t *testing.T) {
 
 	R2(&c2)
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 
 	R3(&c1)
 	R3(&c1)
 
 	R2(&c2)
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 }
 
 func TestRU(t *testing.T) {
@@ -241,7 +235,7 @@ func TestRU(t *testing.T) {
 		PerformAlgorithm(&c1, "R U R' U'")
 	}
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 }
 
 func TestFL(t *testing.T) {
@@ -252,7 +246,7 @@ func TestFL(t *testing.T) {
 		PerformAlgorithm(&c1, "F L F' L'")
 	}
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 }
 
 func TestBD(t *testing.T) {
@@ -266,7 +260,7 @@ func TestBD(t *testing.T) {
 		D3(&c1)
 	}
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 }
 
 func TestSome(t *testing.T) {
@@ -275,7 +269,7 @@ func TestSome(t *testing.T) {
 
 	PerformAlgorithm(&c1, "U F D B L R R' L' B' D' F' U'")
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 }
 
 func TestMore(t *testing.T) {
@@ -284,7 +278,7 @@ func TestMore(t *testing.T) {
 
 	PerformAlgorithm(&c1, "F R U R' U' F' U2 B U L U' L' B' U2")
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 }
 
 func TestRandom(t *testing.T) {
@@ -312,5 +306,5 @@ func TestRandom(t *testing.T) {
 	// PLL
 	PerformAlgorithm(&c1, "R D R' D R D R' B' R D R' D' R' B R2 D' R' D2 R D' R'")
 
-	assertCubeEqual(t, c1, c2)
+	assertEqual(t, c1, c2)
 }

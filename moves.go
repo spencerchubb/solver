@@ -138,25 +138,28 @@ func invertMoves(moves []byte) []byte {
 	return out
 }
 
+const noCancel = 0xFF
+const perfectCancel = 0xFE
+
 var equivalences = [][]byte{
-	{U2Num, U3Num, 0},
-	{U3Num, 0, U1Num},
-	{0, U1Num, U2Num},
-	{F2Num, F3Num, 0},
-	{F3Num, 0, F1Num},
-	{0, F1Num, F2Num},
-	{D2Num, D3Num, 0},
-	{D3Num, 0, D1Num},
-	{0, D1Num, D2Num},
-	{B2Num, B3Num, 0},
-	{B3Num, 0, B1Num},
-	{0, B1Num, B2Num},
-	{L2Num, L3Num, 0},
-	{L3Num, 0, L1Num},
-	{0, L1Num, L2Num},
-	{R2Num, R3Num, 0},
-	{R3Num, 0, R1Num},
-	{0, R1Num, R2Num},
+	{U2Num, U3Num, perfectCancel},
+	{U3Num, perfectCancel, U1Num},
+	{perfectCancel, U1Num, U2Num},
+	{F2Num, F3Num, perfectCancel},
+	{F3Num, perfectCancel, F1Num},
+	{perfectCancel, F1Num, F2Num},
+	{D2Num, D3Num, perfectCancel},
+	{D3Num, perfectCancel, D1Num},
+	{perfectCancel, D1Num, D2Num},
+	{B2Num, B3Num, perfectCancel},
+	{B3Num, perfectCancel, B1Num},
+	{perfectCancel, B1Num, B2Num},
+	{L2Num, L3Num, perfectCancel},
+	{L3Num, perfectCancel, L1Num},
+	{perfectCancel, L1Num, L2Num},
+	{R2Num, R3Num, perfectCancel},
+	{R3Num, perfectCancel, R1Num},
+	{perfectCancel, R1Num, R2Num},
 }
 
 // Returns 0xFF if the moves cannot be canceled.
@@ -167,7 +170,7 @@ func cancelPairOfMoves(m1, m2 byte) byte {
 	face1 := m1 / 3
 	face2 := m2 / 3
 	if face1 != face2 {
-		return 0xFF
+		return noCancel
 	}
 	return equivalences[m1][m2%3]
 }
@@ -191,9 +194,9 @@ func algString(forward []byte, inverse []byte) string {
 	for _, move := range combined {
 		if len(cleaned) > 0 {
 			cancel := cancelPairOfMoves(cleaned[len(cleaned)-1], move)
-			if cancel == 0xFF {
+			if cancel == noCancel {
 				cleaned = append(cleaned, move)
-			} else if cancel == 0 {
+			} else if cancel == perfectCancel {
 				cleaned = cleaned[:len(cleaned)-1]
 			} else {
 				cleaned[len(cleaned)-1] = cancel
