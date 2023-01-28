@@ -28,3 +28,7 @@ Get specific version (for example, v0.0.1)
 ```
 go get github.com/spencerchubb/solver@v0.0.1
 ```
+
+# Disclaimer
+
+The API may change if I feel like it. Feel free to use it in your code.
