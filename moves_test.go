@@ -4,7 +4,6 @@ import (
 	"testing"
 )
 
-
 func TestInvertMove(t *testing.T) {
 	assertEqual(t, U1Num, invertMove(U3Num))
 	assertEqual(t, U2Num, invertMove(U2Num))
@@ -305,6 +304,15 @@ func TestRandom(t *testing.T) {
 
 	// PLL
 	PerformAlgorithm(&c1, "R D R' D R D R' B' R D R' D' R' B R2 D' R' D2 R D' R'")
+
+	assertEqual(t, c1, c2)
+}
+
+func TestSlices(t *testing.T) {
+	c1 := NewCube()
+	c2 := NewCube()
+
+	PerformAlgorithm(&c1, "M E S M' S2 E' M2 S' E2 S M2 S E2")
 
 	assertEqual(t, c1, c2)
 }

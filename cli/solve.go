@@ -48,7 +48,7 @@ func main() {
 	cube := solver.NewCube()
 	solver.PerformAlgorithm(&cube, argMap[KEY_SCRAMBLE])
 
-	var moves []int
+	var moves []byte
 	for _, char := range argMap[KEY_MOVES] {
 		switch char {
 		case 'U':

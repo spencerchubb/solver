@@ -33,7 +33,7 @@ func sameFace(moves []byte, move byte) bool {
 	return move/3 == oppositeFaces[lastMove/3] && move/3 == secondLastMove/3
 }
 
-func Solve(cube Cube, moves []int, maxSolutions int, maxMs int64, log bool) []string {
+func Solve(cube Cube, moves []byte, maxSolutions int, maxMs int64, log bool) []string {
 	depth := 0
 	inverseDepth := 0
 
@@ -105,11 +105,11 @@ func check(node *Node, visited Visited, solutions *[]string, solutionExists *map
 	return nil
 }
 
-func goToChild(queue *[]*Node, node *Node, visited Visited, move int) {
-	if !sameFace(*node.moves, moveAliases[move]) {
+func goToChild(queue *[]*Node, node *Node, visited Visited, move byte) {
+	if !sameFace(*node.moves, move) {
 		cpy := node.cube
-		allMoves[move](&cpy)
-		newMoves := appendImmutable(*node.moves, moveAliases[move])
+		moveFuncs[move](&cpy)
+		newMoves := appendImmutable(*node.moves, move)
 		*queue = append(*queue, &Node{cpy, &newMoves})
 
 		add(visited, cpy, newMoves)
