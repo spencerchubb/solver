@@ -38,9 +38,6 @@ var moveNames = []string{
 	"M", "M2", "M'",
 	"E", "E2", "E'",
 	"S", "S2", "S'",
-	"x", "x2", "x'",
-	"y", "y2", "y'",
-	"z", "z2", "z'",
 }
 
 var moveFuncs = []func(*Cube){
@@ -53,9 +50,6 @@ var moveFuncs = []func(*Cube){
 	M1, M2, M3,
 	E1, E2, E3,
 	S1, S2, S3,
-	X1, X2, X3,
-	Y1, Y2, Y3,
-	Z1, Z2, Z3,
 }
 
 func invertMove(move byte) byte {
@@ -210,23 +204,59 @@ func PerformAlgorithm(cube *Cube, algorithm string) {
 		case "S'":
 			S3(cube)
 		case "x":
-			X1(cube)
+			R1(cube)
+			M3(cube)
+			L3(cube)
 		case "x2":
-			X2(cube)
+			R2(cube)
+			M2(cube)
+			L2(cube)
 		case "x'":
-			X3(cube)
+			R3(cube)
+			M1(cube)
+			L1(cube)
 		case "y":
-			Y1(cube)
+			U1(cube)
+			E3(cube)
+			D3(cube)
 		case "y2":
-			Y2(cube)
+			U2(cube)
+			E2(cube)
+			D2(cube)
 		case "y'":
-			Y3(cube)
+			U3(cube)
+			E1(cube)
+			D1(cube)
 		case "z":
-			Z1(cube)
+			F1(cube)
+			S1(cube)
+			B3(cube)
 		case "z2":
-			Z2(cube)
+			F2(cube)
+			S2(cube)
+			B2(cube)
 		case "z'":
-			Z3(cube)
+			F3(cube)
+			S3(cube)
+			B1(cube)
+		case "l":
+			L1(cube)
+			M1(cube)
+		case "l2":
+			L2(cube)
+			M2(cube)
+		case "l'":
+			L3(cube)
+			M3(cube)
+		case "r":
+			R1(cube)
+			M3(cube)
+		case "r2":
+			R2(cube)
+			M2(cube)
+		case "r'":
+			R3(cube)
+			M1(cube)
 		default:
 			fmt.Printf("Unknown move: %s\n", move)
 		}
@@ -674,58 +704,4 @@ func S3(c *Cube) {
 	c[25] = c[22]
 	c[22] = c[24]
 	c[24] = temp
-}
-
-func X1(c *Cube) {
-	R1(c)
-	M3(c)
-	L3(c)
-}
-
-func X2(c *Cube) {
-	R2(c)
-	M2(c)
-	L2(c)
-}
-
-func X3(c *Cube) {
-	R3(c)
-	M1(c)
-	L1(c)
-}
-
-func Y1(c *Cube) {
-	U1(c)
-	E3(c)
-	D3(c)
-}
-
-func Y2(c *Cube) {
-	U2(c)
-	E2(c)
-	D2(c)
-}
-
-func Y3(c *Cube) {
-	U3(c)
-	E1(c)
-	D1(c)
-}
-
-func Z1(c *Cube) {
-	F1(c)
-	S1(c)
-	B3(c)
-}
-
-func Z2(c *Cube) {
-	F2(c)
-	S2(c)
-	B2(c)
-}
-
-func Z3(c *Cube) {
-	F3(c)
-	S3(c)
-	B1(c)
 }
