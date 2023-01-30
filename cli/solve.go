@@ -45,8 +45,9 @@ func main() {
 		return
 	}
 
-	cube := solver.NewCube()
-	solver.PerformAlgorithm(&cube, argMap[KEY_SCRAMBLE])
+	start := solver.NewCube()
+	end := solver.NewCube()
+	solver.PerformAlgorithm(&start, argMap[KEY_SCRAMBLE])
 
 	var moves []byte
 	for _, char := range argMap[KEY_MOVES] {
@@ -77,7 +78,7 @@ func main() {
 
 	startTime := time.Now()
 
-	solver.Solve(cube, moves, maxSolutions, 60_000, true)
+	solver.Solve(start, end, moves, maxSolutions, 60_000, true)
 
 	endTime := time.Now()
 	fmt.Printf("Time: %v", endTime.Sub(startTime))

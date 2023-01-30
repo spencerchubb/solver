@@ -1,8 +1,0 @@
-package solver
-
-const U = 0x0
-const F = 0x1
-const D = 0x2
-const B = 0x3
-const L = 0x4
-const R = 0x5

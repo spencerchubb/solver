@@ -149,12 +149,12 @@ func algString(forward []byte, inverse []byte) string {
 	for i, m := range cleaned {
 		movesAsStrings[i] = moveNames[m]
 	}
+	fmt.Printf("%v - %v - %v\n", forward, inverse, movesAsStrings)
 	return strings.Join(movesAsStrings, " ")
 }
 
 func PerformAlgorithm(cube *Cube, algorithm string) {
 	for _, move := range strings.Split(algorithm, " ") {
-		fmt.Println(cube)
 		switch move {
 		case "U":
 			U1(cube)
@@ -236,6 +236,9 @@ func PerformAlgorithm(cube *Cube, algorithm string) {
 
 // Twist a corner clockwise
 func twistCW(b byte) byte {
+	if b == disregard {
+		return b
+	}
 	upper := b & 0xF0
 	lower := b & 0x0F
 	return ((upper+1)%3)<<4 | lower
@@ -243,6 +246,9 @@ func twistCW(b byte) byte {
 
 // Twist a corner counter-clockwise
 func twistCCW(b byte) byte {
+	if b == disregard {
+		return b
+	}
 	upper := b & 0xF0
 	lower := b & 0x0F
 	return ((upper+2)%3)<<4 | lower
@@ -251,6 +257,9 @@ func twistCCW(b byte) byte {
 
 // Flip an edge
 func flip(b byte) byte {
+	if b == disregard {
+		return b
+	}
 	return b ^ 0b00010000
 }
 

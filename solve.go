@@ -33,7 +33,7 @@ func sameFace(moves []byte, move byte) bool {
 	return move/3 == oppositeFaces[lastMove/3] && move/3 == secondLastMove/3
 }
 
-func Solve(cube Cube, moves []byte, maxSolutions int, maxMs int64, log bool) []string {
+func Solve(start Cube, end Cube, moves []byte, maxSolutions int, maxMs int64, log bool) []string {
 	depth := 0
 	inverseDepth := 0
 
@@ -41,8 +41,8 @@ func Solve(cube Cube, moves []byte, maxSolutions int, maxMs int64, log bool) []s
 	inverseVisited := initVisited()
 
 	// It is faster with *Node instead of Node
-	queue := []*Node{{cube, &[]byte{}}}
-	inverseQueue := []*Node{{NewCube(), &[]byte{}}}
+	queue := []*Node{{start, &[]byte{}}}
+	inverseQueue := []*Node{{end, &[]byte{}}}
 
 	solutionExists := make(map[string]bool)
 	var solutions []string
