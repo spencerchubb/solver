@@ -149,7 +149,6 @@ func algString(forward []byte, inverse []byte) string {
 	for i, m := range cleaned {
 		movesAsStrings[i] = moveNames[m]
 	}
-	fmt.Printf("%v - %v - %v\n", forward, inverse, movesAsStrings)
 	return strings.Join(movesAsStrings, " ")
 }
 

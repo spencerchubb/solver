@@ -59,14 +59,34 @@ func Solve(start Cube, end Cube, moves []byte, maxSolutions int, maxMs int64, lo
 		inverseNode := inverseQueue[0]
 		inverseQueue = inverseQueue[1:]
 
-		results := check(inverseNode, visited, &solutions, &solutionExists, maxSolutions, log)
-		if results != nil {
-			return *results
+		algs := get(visited, inverseNode.cube)
+		for _, alg := range algs {
+			algStr := algString(alg, *inverseNode.moves)
+			if solutionExists[algStr] {
+				continue
+			}
+			solutionExists[algStr] = true
+			if log {
+				fmt.Println(algStr)
+			}
+			solutions = append(solutions, algStr)
 		}
 
-		results = check(node, inverseVisited, &solutions, &solutionExists, maxSolutions, log)
-		if results != nil {
-			return *results
+		algs = get(inverseVisited, node.cube)
+		for _, alg := range algs {
+			algStr := algString(*node.moves, alg)
+			if solutionExists[algStr] {
+				continue
+			}
+			solutionExists[algStr] = true
+			if log {
+				fmt.Println(algStr)
+			}
+			solutions = append(solutions, algStr)
+		}
+
+		if len(solutions) >= maxSolutions {
+			return solutions
 		}
 
 		if log && len(*node.moves) > depth {
@@ -84,25 +104,6 @@ func Solve(start Cube, end Cube, moves []byte, maxSolutions int, maxMs int64, lo
 			goToChild(&inverseQueue, inverseNode, inverseVisited, move)
 		}
 	}
-}
-
-func check(node *Node, visited Visited, solutions *[]string, solutionExists *map[string]bool, maxSolutions int, log bool) *[]string {
-	algs := get(visited, node.cube)
-	for _, alg := range algs {
-		algStr := algString(alg, *node.moves)
-		if (*solutionExists)[algStr] {
-			continue
-		}
-		if log {
-			fmt.Println(algStr)
-		}
-		(*solutionExists)[algStr] = true
-		*solutions = append(*solutions, algStr)
-		if len(*solutions) >= maxSolutions {
-			return solutions
-		}
-	}
-	return nil
 }
 
 func goToChild(queue *[]*Node, node *Node, visited Visited, move byte) {
