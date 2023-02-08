@@ -34,6 +34,8 @@ func sameFace(moves []byte, move byte) bool {
 }
 
 func Solve(start Cube, end Cube, moves []byte, maxSolutions int, maxMs int64, log bool) []string {
+	check32Bit()
+
 	depth := 0
 	inverseDepth := 0
 
