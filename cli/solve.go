@@ -47,7 +47,7 @@ func main() {
 
 	start := solver.NewCube()
 	end := solver.NewCube()
-	solver.PerformAlgorithm(&start, argMap[KEY_SCRAMBLE])
+	solver.PerformAlgString(&start, argMap[KEY_SCRAMBLE])
 
 	var moves []byte
 	for _, char := range argMap[KEY_MOVES] {

@@ -24,9 +24,6 @@ const R1Num, R2Num, R3Num byte = 15, 16, 17
 const M1Num, M2Num, M3Num byte = 18, 19, 20
 const E1Num, E2Num, E3Num byte = 21, 22, 23
 const S1Num, S2Num, S3Num byte = 24, 25, 26
-const X1Num, X2Num, X3Num byte = 27, 28, 29
-const Y1Num, Y2Num, Y3Num byte = 30, 31, 32
-const Z1Num, Z2Num, Z3Num byte = 33, 34, 35
 
 var moveNames = []string{
 	"U", "U2", "U'",
@@ -64,10 +61,10 @@ func invertMove(move byte) byte {
 	panic("unreachable")
 }
 
-func invertMoves(moves []byte) []byte {
-	out := make([]byte, len(moves))
-	for i, move := range moves {
-		out[len(moves)-i-1] = invertMove(move)
+func InvertAlgorithm(alg Algorithm) Algorithm {
+	out := make(Algorithm, len(alg))
+	for i, move := range alg {
+		out[len(alg)-i-1] = invertMove(move)
 	}
 	return out
 }
@@ -109,22 +106,10 @@ func cancelPairOfMoves(m1, m2 byte) byte {
 	return equivalences[m1][m2%3]
 }
 
-func cancelMoves(moves []byte) []byte {
-	out := make([]byte, 0, len(moves))
-	for _, move := range moves {
-		if len(out) > 0 && out[len(out)-1] == invertMove(move) {
-			out = out[:len(out)-1]
-		} else {
-			out = append(out, move)
-		}
-	}
-	return out
-}
-
-func algString(forward []byte, inverse []byte) string {
-	inverted := invertMoves(inverse)
+func algString(forward Algorithm, inverse Algorithm) string {
+	inverted := InvertAlgorithm(inverse)
 	combined := appendImmutable(forward, inverted...)
-	cleaned := make([]byte, 0, len(combined))
+	cleaned := make(Algorithm, 0, len(combined))
 	for _, move := range combined {
 		if len(cleaned) > 0 {
 			cancel := cancelPairOfMoves(cleaned[len(cleaned)-1], move)
@@ -146,121 +131,112 @@ func algString(forward []byte, inverse []byte) string {
 	return strings.Join(movesAsStrings, " ")
 }
 
-func PerformAlgorithm(cube *Cube, algorithm string) {
-	for _, move := range strings.Split(algorithm, " ") {
+func StringToAlg(algStr string) Algorithm {
+	moveStrings := strings.Split(algStr, " ")
+	moves := make(Algorithm, 0, len(moveStrings))
+	for _, move := range moveStrings {
 		switch move {
 		case "U":
-			U1(cube)
+			moves = append(moves, U1Num)
 		case "U2":
-			U2(cube)
+			moves = append(moves, U2Num)
 		case "U'":
-			U3(cube)
+			moves = append(moves, U3Num)
 		case "F":
-			F1(cube)
+			moves = append(moves, F1Num)
 		case "F2":
-			F2(cube)
+			moves = append(moves, F2Num)
 		case "F'":
-			F3(cube)
+			moves = append(moves, F3Num)
 		case "D":
-			D1(cube)
+			moves = append(moves, D1Num)
 		case "D2":
-			D2(cube)
+			moves = append(moves, D2Num)
 		case "D'":
-			D3(cube)
+			moves = append(moves, D3Num)
 		case "B":
-			B1(cube)
+			moves = append(moves, B1Num)
 		case "B2":
-			B2(cube)
+			moves = append(moves, B2Num)
 		case "B'":
-			B3(cube)
+			moves = append(moves, B3Num)
 		case "L":
-			L1(cube)
+			moves = append(moves, L1Num)
 		case "L2":
-			L2(cube)
+			moves = append(moves, L2Num)
 		case "L'":
-			L3(cube)
+			moves = append(moves, L3Num)
 		case "R":
-			R1(cube)
+			moves = append(moves, R1Num)
 		case "R2":
-			R2(cube)
+			moves = append(moves, R2Num)
 		case "R'":
-			R3(cube)
+			moves = append(moves, R3Num)
 		case "M":
-			M1(cube)
+			moves = append(moves, M1Num)
 		case "M2":
-			M2(cube)
+			moves = append(moves, M2Num)
 		case "M'":
-			M3(cube)
+			moves = append(moves, M3Num)
 		case "E":
-			E1(cube)
+			moves = append(moves, E1Num)
 		case "E2":
-			E2(cube)
+			moves = append(moves, E2Num)
 		case "E'":
-			E3(cube)
+			moves = append(moves, E3Num)
 		case "S":
-			S1(cube)
+			moves = append(moves, S1Num)
 		case "S2":
-			S2(cube)
+			moves = append(moves, S2Num)
 		case "S'":
-			S3(cube)
+			moves = append(moves, S3Num)
 		case "x":
-			R1(cube)
-			M3(cube)
-			L3(cube)
+			moves = append(moves, R1Num, M3Num, L3Num)
 		case "x2":
-			R2(cube)
-			M2(cube)
-			L2(cube)
+			moves = append(moves, R2Num, M2Num, L2Num)
 		case "x'":
-			R3(cube)
-			M1(cube)
-			L1(cube)
+			moves = append(moves, R3Num, M1Num, L1Num)
 		case "y":
-			U1(cube)
-			E3(cube)
-			D3(cube)
+			moves = append(moves, U1Num, E3Num, D3Num)
 		case "y2":
-			U2(cube)
-			E2(cube)
-			D2(cube)
+			moves = append(moves, U2Num, E2Num, D2Num)
 		case "y'":
-			U3(cube)
-			E1(cube)
-			D1(cube)
+			moves = append(moves, U3Num, E1Num, D1Num)
 		case "z":
-			F1(cube)
-			S1(cube)
-			B3(cube)
+			moves = append(moves, F1Num, S1Num, B3Num)
 		case "z2":
-			F2(cube)
-			S2(cube)
-			B2(cube)
+			moves = append(moves, F2Num, S2Num, B2Num)
 		case "z'":
-			F3(cube)
-			S3(cube)
-			B1(cube)
+			moves = append(moves, F3Num, S3Num, B1Num)
 		case "l":
-			L1(cube)
-			M1(cube)
+			moves = append(moves, L1Num, M1Num)
 		case "l2":
-			L2(cube)
-			M2(cube)
+			moves = append(moves, L2Num, M2Num)
 		case "l'":
-			L3(cube)
-			M3(cube)
+			moves = append(moves, L3Num, M3Num)
 		case "r":
-			R1(cube)
-			M3(cube)
+			moves = append(moves, R1Num, M3Num)
 		case "r2":
-			R2(cube)
-			M2(cube)
+			moves = append(moves, R2Num, M2Num)
 		case "r'":
-			R3(cube)
-			M1(cube)
+			moves = append(moves, R3Num, M1Num)
 		default:
 			fmt.Printf("Unknown move: %s\n", move)
 		}
 	}
+	return moves
+}
+
+func PerformAlgorithm(cube *Cube, alg Algorithm) {
+	for _, move := range alg {
+		moveFunc := moveFuncs[move]
+		moveFunc(cube)
+	}
+}
+
+func PerformAlgString(cube *Cube, algStr string) {
+	alg := StringToAlg(algStr)
+	PerformAlgorithm(cube, alg)
 }
 
 // Twist a corner clockwise

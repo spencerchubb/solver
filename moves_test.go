@@ -25,7 +25,7 @@ func TestInvertMove(t *testing.T) {
 	assertEqual(t, R3Num, invertMove(R1Num))
 }
 
-func TestInvertMoves(t *testing.T) {
+func TestInvertAlgorithm(t *testing.T) {
 	moves := []byte{
 		U1Num, U2Num, U3Num,
 		F1Num, F2Num, F3Num,
@@ -34,7 +34,7 @@ func TestInvertMoves(t *testing.T) {
 		L1Num, L2Num, L3Num,
 		R1Num, R2Num, R3Num,
 	}
-	moves = invertMoves(moves)
+	moves = InvertAlgorithm(moves)
 	expected := []byte{
 		R1Num, R2Num, R3Num,
 		L1Num, L2Num, L3Num,
@@ -231,7 +231,7 @@ func TestRU(t *testing.T) {
 	c2 := NewCube()
 
 	for i := 0; i < 6; i++ {
-		PerformAlgorithm(&c1, "R U R' U'")
+		PerformAlgString(&c1, "R U R' U'")
 	}
 
 	assertEqual(t, c1, c2)
@@ -242,7 +242,7 @@ func TestFL(t *testing.T) {
 	c2 := NewCube()
 
 	for i := 0; i < 6; i++ {
-		PerformAlgorithm(&c1, "F L F' L'")
+		PerformAlgString(&c1, "F L F' L'")
 	}
 
 	assertEqual(t, c1, c2)
@@ -266,7 +266,7 @@ func TestSome(t *testing.T) {
 	c1 := NewCube()
 	c2 := NewCube()
 
-	PerformAlgorithm(&c1, "U F D B L R R' L' B' D' F' U'")
+	PerformAlgString(&c1, "U F D B L R R' L' B' D' F' U'")
 
 	assertEqual(t, c1, c2)
 }
@@ -275,7 +275,7 @@ func TestMore(t *testing.T) {
 	c1 := NewCube()
 	c2 := NewCube()
 
-	PerformAlgorithm(&c1, "F R U R' U' F' U2 B U L U' L' B' U2")
+	PerformAlgString(&c1, "F R U R' U' F' U2 B U L U' L' B' U2")
 
 	assertEqual(t, c1, c2)
 }
@@ -285,25 +285,25 @@ func TestRandom(t *testing.T) {
 	c2 := NewCube()
 
 	// Scramble
-	PerformAlgorithm(&c1, "R F B2 U2 B' L' D F' B L2 D2 R2 U R' D' F2 U' L")
+	PerformAlgString(&c1, "R F B2 U2 B' L' D F' B L2 D2 R2 U R' D' F2 U' L")
 
 	// Cross
-	PerformAlgorithm(&c1, "R D2 L2")
+	PerformAlgString(&c1, "R D2 L2")
 
 	// Pair 1
-	PerformAlgorithm(&c1, "D F D' F' D F' D2 F")
+	PerformAlgString(&c1, "D F D' F' D F' D2 F")
 
 	// Pair 2
-	PerformAlgorithm(&c1, "D2 R' D R")
+	PerformAlgString(&c1, "D2 R' D R")
 
 	// Pair 3+4
-	PerformAlgorithm(&c1, "L' D' L D' B D B2 D' B D' R D R'")
+	PerformAlgString(&c1, "L' D' L D' B D B2 D' B D' R D R'")
 
 	// OLL
-	PerformAlgorithm(&c1, "B' D' L' D L B")
+	PerformAlgString(&c1, "B' D' L' D L B")
 
 	// PLL
-	PerformAlgorithm(&c1, "R D R' D R D R' B' R D R' D' R' B R2 D' R' D2 R D' R'")
+	PerformAlgString(&c1, "R D R' D R D R' B' R D R' D' R' B R2 D' R' D2 R D' R'")
 
 	assertEqual(t, c1, c2)
 }
@@ -312,7 +312,7 @@ func TestSlices(t *testing.T) {
 	c1 := NewCube()
 	c2 := NewCube()
 
-	PerformAlgorithm(&c1, "M E S M' S2 E' M2 S' E2 S M2 S E2")
+	PerformAlgString(&c1, "M E S M' S2 E' M2 S' E2 S M2 S E2")
 
 	assertEqual(t, c1, c2)
 }

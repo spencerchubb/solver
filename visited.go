@@ -14,5 +14,5 @@ func get(visited Visited, cube Cube) Algorithms {
 }
 
 func initVisited() Visited {
-	return make(Visited, 10_000_000)
+	return make(Visited, 1_000_000)
 }

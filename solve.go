@@ -39,6 +39,7 @@ func Solve(start Cube, end Cube, moves []byte, maxSolutions int, maxMs int64, lo
 
 	visited := initVisited()
 	inverseVisited := initVisited()
+	fmt.Println("Still okay")
 
 	// It is faster with *Node instead of Node
 	queue := []*Node{{start, &[]byte{}}}

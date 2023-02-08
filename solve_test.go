@@ -7,7 +7,7 @@ import (
 func TestSolve(t *testing.T) {
 	start := NewCube()
 	end := NewCube()
-	PerformAlgorithm(&start, "R U R' F' R U R' U' R' F R2 U' R' U'")
+	PerformAlgString(&start, "R U R' F' R U R' U' R' F R2 U' R' U'")
 
 	moves := []byte{U1Num, U2Num, U3Num, F1Num, F2Num, F3Num, R1Num, R2Num, R3Num}
 
@@ -32,7 +32,7 @@ func TestOnlyOrientation(t *testing.T) {
 	end := NewCube()
 	start.SetOnlyOrientation([]int{0, 1, 2, 3, 8, 9, 10, 11})
 	end.SetOnlyOrientation([]int{0, 1, 2, 3, 8, 9, 10, 11})
-	PerformAlgorithm(&start, "M' U M U2 M' U M")
+	PerformAlgString(&start, "M' U M U2 M' U M")
 
 	moves := []byte{U1Num, U2Num, U3Num, F1Num, F2Num, F3Num, R1Num, R2Num, R3Num}
 
@@ -57,7 +57,7 @@ func TestDisregard(t *testing.T) {
 	end := NewCube()
 	start.SetDisregard([]int{0, 1, 2, 3})
 	end.SetDisregard([]int{0, 1, 2, 3})
-	PerformAlgorithm(&start, "M' U M U2 M' U M")
+	PerformAlgString(&start, "M' U M U2 M' U M")
 
 	moves := []byte{U1Num, U2Num, U3Num, F1Num, F2Num, F3Num, R1Num, R2Num, R3Num}
 
