@@ -49,7 +49,7 @@ func Solve(start Cube, end Cube, moves []byte, maxSolutions int, maxMs int64, lo
 	solutionExists := make(map[string]bool)
 	var solutions []string
 	var startMs = time.Now().UnixMilli()
-	for loc := 0; ; loc++ {
+	for {
 		elapsedMs := time.Now().UnixMilli() - startMs
 		if elapsedMs > maxMs {
 			return solutions
