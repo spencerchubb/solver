@@ -1,32 +1,32 @@
-use crate::moves::alg_string;
-use crate::{arch::check_32_bit, cube::Cube, visited::Visited, node::Node};
+use crate::algorithm::Algorithm;
+use crate::{arch::check_32_bit, cube::Cube, moves::alg_string, queue::Queue, visited::Visited, node::Node};
 
-use std::collections::{VecDeque, HashSet};
+use std::collections::HashSet;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 const OPPOSITE_FACES: [u8; 6] = [2, 3, 0, 1, 5, 4];
 
-fn same_face(moves: &[u8], mooove: u8) -> bool {
-    if moves.is_empty() {
+fn same_face(alg: &Algorithm, mooove: u8) -> bool {
+    if alg.len() == 0 {
         return false;
     }
 
-    let last_move = moves[moves.len() - 1];
+    let last_move = alg[alg.len() - 1];
 
     if last_move / 3 == mooove / 3 {
         return true;
     }
 
-    if moves.len() == 1 {
+    if alg.len() == 1 {
         return false;
     }
 
-    let second_last_move = moves[moves.len() - 2];
+    let second_last_move = alg[alg.len() - 2];
 
     mooove / 3 == OPPOSITE_FACES[last_move as usize / 3] && mooove / 3 == second_last_move / 3
 }
 
-pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, max_ms: u128, log: bool) -> Vec<String> {
+pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, max_ms: u128, log: bool) -> HashSet<String> {
     check_32_bit();
 
     let mut depth = 0;
@@ -35,21 +35,22 @@ pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, max_m
     let mut visited = Visited::new();
     let mut inverse_visited = Visited::new();
 
-    let mut queue = VecDeque::new();
-    queue.push_back(Node{ cube: start, moves: vec![] });
+    let mut queue = Queue::new();
+    queue.push(Node{ cube: start, alg: Algorithm::new() });
 
-    let mut inverse_queue = VecDeque::new();
-    inverse_queue.push_back(Node{ cube: end, moves: vec![] });
+    let mut inverse_queue = Queue::new();
+    inverse_queue.push(Node{ cube: end, alg: Algorithm::new() });
 
     let mut solutions = HashSet::new();
     let start_ms = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
+    let mut cumulative_time = 0;
     while SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() - start_ms < max_ms {
-        let node = queue.pop_front().unwrap();
-        let inverse_node = inverse_queue.pop_front().unwrap();
+        let node = queue.pop();
+        let inverse_node = inverse_queue.pop();
 
         let algs = visited.get(inverse_node.cube);
         for alg in algs {
-            let alg_str = alg_string(alg, inverse_node.moves.clone());
+            let alg_str = alg_string(alg, inverse_node.alg.clone());
             if log {
                 println!("{}", alg_str);
             }
@@ -58,7 +59,7 @@ pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, max_m
 
         let algs = inverse_visited.get(node.cube);
         for alg in algs {
-            let alg_str = alg_string(node.moves.clone(), alg);
+            let alg_str = alg_string(node.alg.clone(), alg);
             if log {
                 println!("{}", alg_str);
             }
@@ -66,41 +67,47 @@ pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, max_m
         }
 
         if solutions.len() >= max_solutions as usize {
-            return solutions.into_iter().collect();
+            println!("cumulative time: {} ms", cumulative_time);
+            println!("elapsed before drop: {} ms", SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() - start_ms);
+            return solutions;
         }
 
-        if log && node.moves.len() > depth {
-            depth = node.moves.len();
-            println!("Searching depth: {}", depth);
+        if log && node.alg.len() > depth {
+            depth = node.alg.len();
+            println!("Searching depth: {} ms", depth);
         }
 
-        if log && inverse_node.moves.len() > inverse_depth {
-            inverse_depth = inverse_node.moves.len();
+        if log && inverse_node.alg.len() > inverse_depth {
+            inverse_depth = inverse_node.alg.len();
             println!("Searching inverse depth: {}", inverse_depth);
         }
 
         for mooove in moves {
-            if !same_face(&node.moves, *mooove) {
+            if !same_face(&node.alg, *mooove) {
                 let mut cpy = node.cube;
                 cpy.perform_move(*mooove);
         
-                let mut new_moves = node.moves.clone();
-                new_moves.push(*mooove);
+                let mut new_alg = node.alg.clone();
+                new_alg.push(*mooove);
         
-                queue.push_back(Node{ cube: cpy, moves: new_moves.clone() });
+                let temp_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
+                queue.push(Node{ cube: cpy, alg: new_alg.clone() });
+                cumulative_time += SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() - temp_time;
         
-                visited.add(cpy, new_moves);
+                visited.add(cpy, new_alg);
             }
-            if !same_face(&inverse_node.moves, *mooove) {
+            if !same_face(&inverse_node.alg, *mooove) {
                 let mut cpy = inverse_node.cube;
                 cpy.perform_move(*mooove);
         
-                let mut new_moves = inverse_node.moves.clone();
-                new_moves.push(*mooove);
+                let mut new_alg = inverse_node.alg.clone();
+                new_alg.push(*mooove);
         
-                inverse_queue.push_back(Node{ cube: cpy, moves: new_moves.clone() });
+                let temp_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
+                inverse_queue.push(Node{ cube: cpy, alg: new_alg.clone() });
+                cumulative_time += SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() - temp_time;
         
-                inverse_visited.add(cpy, new_moves);
+                inverse_visited.add(cpy, new_alg);
             }
 
             // go_to_child(&mut queue, &node, &mut visited, *mooove);
@@ -108,7 +115,9 @@ pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, max_m
         }
     }
 
-    solutions.into_iter().collect()
+    println!("cumulative time: {} ms", cumulative_time);
+    println!("elapsed before drop: {} ms", SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() - start_ms);
+    solutions
 }
 
 // fn go_to_child(queue: &mut VecDeque<Node>, node: &Node, visited: &mut Visited, mooove: u8) {
@@ -142,6 +151,7 @@ mod tests {
         let log = false;
 
         let solutions = run_solve(start, end, &moves, max_solutions, max_ms, log);
+        let solutions: Vec<String> = solutions.into_iter().collect();
         let expected = [
             "R U2 F' R' F U' F' R F U' R' U'",
             "U R U F' R' F U F' R F U2 R'",

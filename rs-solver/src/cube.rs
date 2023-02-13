@@ -1,6 +1,7 @@
 pub const DISREGARD: u8 = 0xFF;
 
 #[derive(Copy, Clone)]
+#[derive(PartialEq, Eq, Hash)]
 pub struct Cube {
     pub state: [u8; 26],
 }

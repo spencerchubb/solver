@@ -1,6 +1,6 @@
+use crate::algorithm::Algorithm;
 use crate::cube::{Cube, DISREGARD};
-use crate::visited::string_to_alg;
-use crate::visited::Algorithm;
+use crate::algorithm::string_to_alg;
 
 //          00 08 01
 //          09 20 10
@@ -95,7 +95,7 @@ fn invert_move(m: u8) -> u8 {
 }
 
 pub fn invert_algorithm(alg: Algorithm) -> Algorithm {
-    let mut out = Vec::new();
+    let mut out = Algorithm::new();
     for m in alg {
         out.push(invert_move(m));
     }

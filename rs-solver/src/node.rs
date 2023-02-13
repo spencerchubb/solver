@@ -1,6 +1,6 @@
-use crate::{cube::Cube, visited::Algorithm};
+use crate::{algorithm::Algorithm, cube::Cube};
 
 pub struct Node{
     pub cube: Cube,
-    pub moves: Algorithm,
+    pub alg: Algorithm,
 }
