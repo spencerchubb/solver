@@ -2,15 +2,16 @@ use crate::algorithm::{Algorithm, Algorithms};
 use crate::cube::Cube;
 
 use std::collections::HashMap;
+use ahash::random_state::RandomState;
 
 pub struct Visited {
-    data: HashMap<[u8; 26], Algorithms>,
+    data: HashMap<[u8; 26], Algorithms, RandomState>,
 }
 
 impl Visited {
     pub fn new() -> Visited {
         Visited {
-            data: HashMap::with_capacity(1_000_000),
+            data: HashMap::with_capacity_and_hasher(1_000_000, RandomState::new()),
         }
     }
 

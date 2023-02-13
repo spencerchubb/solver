@@ -6,7 +6,6 @@ pub type Algorithm = SmallVec<[u8; 8]>;
 pub type Algorithms = SmallVec<[Algorithm; 1]>;
 
 pub fn string_to_alg(alg_string: &str) -> Algorithm {
-    // let mut vec = Vec::new();
     let mut alg = Algorithm::new();
     for s in alg_string.split(' ') {
         match s {

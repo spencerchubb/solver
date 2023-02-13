@@ -86,27 +86,28 @@ pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, max_m
             if !same_face(&node.alg, *mooove) {
                 let mut cpy = node.cube;
                 cpy.perform_move(*mooove);
-        
+                
                 let mut new_alg = node.alg.clone();
                 new_alg.push(*mooove);
-        
+                
                 let temp_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
                 queue.push(Node{ cube: cpy, alg: new_alg.clone() });
                 cumulative_time += SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() - temp_time;
-        
+                
                 visited.add(cpy, new_alg);
             }
             if !same_face(&inverse_node.alg, *mooove) {
                 let mut cpy = inverse_node.cube;
                 cpy.perform_move(*mooove);
-        
+                
                 let mut new_alg = inverse_node.alg.clone();
+                
                 new_alg.push(*mooove);
-        
+
                 let temp_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
                 inverse_queue.push(Node{ cube: cpy, alg: new_alg.clone() });
                 cumulative_time += SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() - temp_time;
-        
+                
                 inverse_visited.add(cpy, new_alg);
             }
 
@@ -120,19 +121,19 @@ pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, max_m
     solutions
 }
 
-// fn go_to_child(queue: &mut VecDeque<Node>, node: &Node, visited: &mut Visited, mooove: u8) {
-//     if !same_face(&node.moves, mooove) {
-//         let mut cpy = node.cube;
-//         cpy.perform_move(mooove);
+fn go_to_child(queue: &mut Queue<Node>, node: &Node, visited: &mut Visited, mooove: u8) {
+    if !same_face(&node.alg, mooove) {
+        let mut cpy = node.cube;
+        cpy.perform_move(mooove);
 
-//         let mut new_moves = node.moves.clone();
-//         new_moves.push(mooove);
+        let mut new_alg = node.alg.clone();
+        new_alg.push(mooove);
 
-//         queue.push_back(Node{ cube: cpy, moves: new_moves.clone() });
+        queue.push(Node{ cube: cpy, alg: new_alg.clone() });
 
-//         visited.add(cpy, new_moves);
-//     }
-// }
+        visited.add(cpy, new_alg);
+    }
+}
 
 #[cfg(test)]
 mod tests {

@@ -13,7 +13,7 @@ This repository has two parts:
 - Run a command like the following
 
 ```bash
-./solve -scramble "R U R' F' R U R' U' R' F R2 U' R' U'" -moves UFR -solutions 10
+./solve -scramble "R U R' F' R U R' U' R' F R2 U' R' U'" -moves UFR -solutions 100
 ./solve -scramble "R U R' F' R U R' U' R' F R2 U' R' U'" -moves UFDBLR -solutions 10
 ```
 
