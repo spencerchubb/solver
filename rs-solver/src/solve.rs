@@ -10,7 +10,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 const OPPOSITE_FACES: [u8; 6] = [2, 3, 0, 1, 5, 4];
 
 fn same_face(alg: &Algorithm, mooove: u8) -> bool {
-    if alg.len() == 0 {
+    if alg.is_empty() {
         return false;
     }
 
@@ -100,7 +100,7 @@ fn reconstruct_algs(seen: &mut HashSet<Cube>, visited: &Visited, cube: &Cube) ->
 
     let moves = visited.get(*cube);
     for mooove in moves {
-        let mut cpy = cube.clone();
+        let mut cpy = *cube;
         if mooove == NULL_MOVE {
             return algs;
         }
@@ -114,7 +114,7 @@ fn reconstruct_algs(seen: &mut HashSet<Cube>, visited: &Visited, cube: &Cube) ->
         }
 
         let algs_subset = reconstruct_algs(seen, visited, &cpy);
-        if algs_subset.len() == 0 {
+        if algs_subset.is_empty() {
             let mut small_vec = SmallVec::new();
             small_vec.push(inverted_move);
             algs.push(small_vec);

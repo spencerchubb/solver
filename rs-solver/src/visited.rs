@@ -1,7 +1,6 @@
 // TODO
 // use crate::algorithm::{Algorithm, Algorithms};
 use crate::cube::Cube;
-use crate::moves::NULL_MOVE;
 
 use std::collections::HashMap;
 use ahash::random_state::RandomState;
@@ -20,15 +19,11 @@ impl Visited {
     }
 
     pub fn add(&mut self, cube: Cube, mooove: u8) {
-        self.data.entry(cube.state).or_insert_with(|| SmallVec::new()).push(mooove);
+        self.data.entry(cube.state).or_insert_with(SmallVec::new).push(mooove);
     }
 
     pub fn get(&self, cube: Cube) -> SmallVec<[u8; 1]> {
         self.data.get(&cube.state).cloned().unwrap_or(SmallVec::new())
-    }
-
-    pub fn contains(&self, cube: Cube) -> bool {
-        self.data.contains_key(&cube.state)
     }
 }
 

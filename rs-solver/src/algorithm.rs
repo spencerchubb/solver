@@ -6,39 +6,8 @@ pub type Algorithm = SmallVec<[u8; 8]>;
 pub type Algorithms = SmallVec<[Algorithm; 1]>;
 
 pub fn alg_to_string(alg: &Algorithm) -> String {
-    // let mut s = String::new();
     let mut strings = Vec::new();
     for m in alg {
-        // match m {
-        //     U1_NUM => s.push_str("U "),
-        //     U2_NUM => s.push_str("U2 "),
-        //     U3_NUM => s.push_str("U' "),
-        //     D1_NUM => s.push_str("D "),
-        //     D2_NUM => s.push_str("D2 "),
-        //     D3_NUM => s.push_str("D' "),
-        //     F1_NUM => s.push_str("F "),
-        //     F2_NUM => s.push_str("F2 "),
-        //     F3_NUM => s.push_str("F' "),
-        //     B1_NUM => s.push_str("B "),
-        //     B2_NUM => s.push_str("B2 "),
-        //     B3_NUM => s.push_str("B' "),
-        //     L1_NUM => s.push_str("L "),
-        //     L2_NUM => s.push_str("L2 "),
-        //     L3_NUM => s.push_str("L' "),
-        //     R1_NUM => s.push_str("R "),
-        //     R2_NUM => s.push_str("R2 "),
-        //     R3_NUM => s.push_str("R' "),
-        //     M1_NUM => s.push_str("M "),
-        //     M2_NUM => s.push_str("M2 "),
-        //     M3_NUM => s.push_str("M' "),
-        //     E1_NUM => s.push_str("E "),
-        //     E2_NUM => s.push_str("E2 "),
-        //     E3_NUM => s.push_str("E' "),
-        //     S1_NUM => s.push_str("S "),
-        //     S2_NUM => s.push_str("S2 "),
-        //     S3_NUM => s.push_str("S' "),
-        //     _ => panic!("Invalid move number"),
-        // }
         strings.push(MOVE_NAMES[*m as usize]);
     }
     strings.join(" ")

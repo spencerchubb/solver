@@ -1,4 +1,4 @@
-use crate::algorithm::{Algorithm, alg_to_string};
+use crate::algorithm::{Algorithm};
 use crate::cube::{Cube, DISREGARD};
 use crate::algorithm::string_to_alg;
 
