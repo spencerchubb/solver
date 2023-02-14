@@ -1,4 +1,4 @@
-use crate::algorithm::Algorithm;
+use crate::algorithm::{Algorithm, alg_to_string};
 use crate::cube::{Cube, DISREGARD};
 use crate::algorithm::string_to_alg;
 
@@ -39,8 +39,9 @@ pub const E3_NUM: u8 = 23;
 pub const S1_NUM: u8 = 24;
 pub const S2_NUM: u8 = 25;
 pub const S3_NUM: u8 = 26;
+pub const NULL_MOVE: u8 = 0xFF;
 
-const MOVE_NAMES: [&str; 27] = [
+pub const MOVE_NAMES: [&str; 27] = [
     "U", "U2", "U'",
     "F", "F2", "F'",
     "D", "D2", "D'",
@@ -85,7 +86,7 @@ const EQUIVALENCES: [[u8; 3]; 27] = [
     [PERFECT_CANCEL, S1_NUM, S2_NUM],
 ];
 
-fn invert_move(m: u8) -> u8 {
+pub fn invert_move(m: u8) -> u8 {
     match m % 3 {
         0 => m + 2,
         1 => m,
@@ -112,13 +113,12 @@ fn cancel_pair_of_moves(m1: u8, m2: u8) -> u8 {
     EQUIVALENCES[m1 as usize][m2 as usize % 3]
 }
 
-pub fn alg_string(forward: Algorithm, inverse: Algorithm) -> String {
-    let inverted = invert_algorithm(inverse);
-    let combined = forward
-        .iter()
-        .chain(inverted.iter())
-        .cloned()
-        .collect::<Vec<u8>>();
+pub fn build_alg_string(forward: Algorithm, inverse: Algorithm) -> String {
+    // println!("build_alg_string: {} - {}", alg_to_string(&forward), alg_to_string(&inverse));
+    let mut reversed = inverse;
+    reversed.reverse();
+    let mut combined = forward;
+    combined.extend(reversed);
     let mut cleaned: Vec<u8> = Vec::new();
     for m in combined {
         let len = cleaned.len();

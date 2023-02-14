@@ -1,5 +1,8 @@
-use crate::algorithm::Algorithm;
-use crate::{arch::check_32_bit, cube::Cube, moves::alg_string, queue::Queue, visited::Visited, node::Node};
+use smallvec::SmallVec;
+
+use crate::algorithm::{Algorithm};
+use crate::moves::{NULL_MOVE, invert_move, build_alg_string};
+use crate::{arch::check_32_bit, cube::Cube, queue::Queue, visited::Visited, node::Node};
 
 use std::collections::HashSet;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -43,96 +46,113 @@ pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, max_m
 
     let mut solutions = HashSet::new();
     let start_ms = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
-    let mut cumulative_time = 0;
     while SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() - start_ms < max_ms {
         let node = queue.pop();
         let inverse_node = inverse_queue.pop();
 
-        let algs = visited.get(inverse_node.cube);
+        let mut seen: HashSet<Cube> = HashSet::new();
+        let algs = reconstruct_algs(&mut seen, &visited, &inverse_node.cube);
         for alg in algs {
-            let alg_str = alg_string(alg, inverse_node.alg.clone());
-            if log {
+            let mut inverse_node_alg = inverse_node.alg.clone();
+            inverse_node_alg.reverse();
+            let alg_str = build_alg_string(inverse_node.alg.clone(), alg);
+            if log && !solutions.contains(&alg_str) {
                 println!("{}", alg_str);
             }
             solutions.insert(alg_str);
         }
 
-        let algs = inverse_visited.get(node.cube);
+        let mut seen: HashSet<Cube> = HashSet::new();
+        let algs = reconstruct_algs(&mut seen, &inverse_visited, &node.cube);
         for alg in algs {
-            let alg_str = alg_string(node.alg.clone(), alg);
-            if log {
+            let alg_str = build_alg_string(node.alg.clone(), alg);
+            if log && !solutions.contains(&alg_str) {
                 println!("{}", alg_str);
             }
             solutions.insert(alg_str);
         }
 
         if solutions.len() >= max_solutions as usize {
-            println!("cumulative time: {} ms", cumulative_time);
-            println!("elapsed before drop: {} ms", SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() - start_ms);
             return solutions;
         }
 
         if log && node.alg.len() > depth {
             depth = node.alg.len();
-            println!("Searching depth: {} ms", depth);
+            println!("depth: {}", depth);
         }
 
         if log && inverse_node.alg.len() > inverse_depth {
             inverse_depth = inverse_node.alg.len();
-            println!("Searching inverse depth: {}", inverse_depth);
+            println!("inverse depth: {}", inverse_depth);
         }
 
         for mooove in moves {
-            if !same_face(&node.alg, *mooove) {
-                let mut cpy = node.cube;
-                cpy.perform_move(*mooove);
-                
-                let mut new_alg = node.alg.clone();
-                new_alg.push(*mooove);
-                
-                let temp_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
-                queue.push(Node{ cube: cpy, alg: new_alg.clone() });
-                cumulative_time += SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() - temp_time;
-                
-                visited.add(cpy, new_alg);
-            }
-            if !same_face(&inverse_node.alg, *mooove) {
-                let mut cpy = inverse_node.cube;
-                cpy.perform_move(*mooove);
-                
-                let mut new_alg = inverse_node.alg.clone();
-                
-                new_alg.push(*mooove);
-
-                let temp_time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
-                inverse_queue.push(Node{ cube: cpy, alg: new_alg.clone() });
-                cumulative_time += SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() - temp_time;
-                
-                inverse_visited.add(cpy, new_alg);
-            }
-
-            // go_to_child(&mut queue, &node, &mut visited, *mooove);
-            // go_to_child(&mut inverse_queue, &inverse_node, &mut inverse_visited, *mooove);
+            go_to_child(&mut queue, &node, &mut visited, *mooove);
+            go_to_child(&mut inverse_queue, &inverse_node, &mut inverse_visited, *mooove);
         }
     }
 
-    println!("cumulative time: {} ms", cumulative_time);
-    println!("elapsed before drop: {} ms", SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() - start_ms);
     solutions
 }
 
-fn go_to_child(queue: &mut Queue<Node>, node: &Node, visited: &mut Visited, mooove: u8) {
-    if !same_face(&node.alg, mooove) {
-        let mut cpy = node.cube;
-        cpy.perform_move(mooove);
+fn reconstruct_algs(seen: &mut HashSet<Cube>, visited: &Visited, cube: &Cube) -> Vec<Algorithm> {
+    let mut algs: Vec<Algorithm> = Vec::new();
 
-        let mut new_alg = node.alg.clone();
-        new_alg.push(mooove);
+    let moves = visited.get(*cube);
+    for mooove in moves {
+        let mut cpy = cube.clone();
+        if mooove == NULL_MOVE {
+            return algs;
+        }
+        let inverted_move = invert_move(mooove);
+        cpy.perform_move(inverted_move);
 
-        queue.push(Node{ cube: cpy, alg: new_alg.clone() });
+        if seen.contains(&cpy) {
+            continue;
+        } else {
+            seen.insert(cpy);
+        }
 
-        visited.add(cpy, new_alg);
+        let algs_subset = reconstruct_algs(seen, visited, &cpy);
+        if algs_subset.len() == 0 {
+            let mut small_vec = SmallVec::new();
+            small_vec.push(inverted_move);
+            algs.push(small_vec);
+        } else {
+            for alg in algs_subset {
+                let mut alg = alg;
+                alg.push(inverted_move);
+                algs.push(alg);
+            }
+        }
     }
+
+    // If 'moves' is empty, then this will just return an empty vec.
+    // This is the base case of the recursion.
+    algs
+}
+
+fn go_to_child(queue: &mut Queue<Node>, node: &Node, visited: &mut Visited, mooove: u8) {
+    if same_face(&node.alg, mooove) {
+        return;
+    }
+    let mut cpy = node.cube;
+    cpy.perform_move(mooove);
+
+    let mut new_alg = node.alg.clone();
+    new_alg.push(mooove);
+
+    // if !visited.contains(cpy) {
+    //     queue.push(Node{ cube: cpy, alg: new_alg });
+    // }
+
+    // if visited.contains(cpy) {
+    //     return;
+    // }
+
+    queue.push(Node{ cube: cpy, alg: new_alg });
+
+    visited.add(cpy, mooove);
 }
 
 #[cfg(test)]

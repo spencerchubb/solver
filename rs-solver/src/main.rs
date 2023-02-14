@@ -18,7 +18,7 @@ fn main() {
     start.perform_alg_string("R U R' F' R U R' U' R' F R2 U' R' U'");
     
     let moves = [U1_NUM, U2_NUM, U3_NUM, F1_NUM, F2_NUM, F3_NUM, R1_NUM, R2_NUM, R3_NUM];
-    let max_solutions = 100;
+    let max_solutions = 10;
     let max_ms = 10_000;
     let log = true;
     
