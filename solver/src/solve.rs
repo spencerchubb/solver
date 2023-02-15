@@ -2,7 +2,7 @@ use smallvec::SmallVec;
 
 use crate::algorithm::{Algorithm};
 use crate::moves::{NULL_MOVE, invert_move, build_alg_string};
-use crate::{arch::check_32_bit, cube::Cube, queue::Queue, visited::Visited, node::Node};
+use crate::{cube::Cube, queue::Queue, visited::Visited, node::Node};
 
 use std::collections::HashSet;
 
@@ -28,11 +28,7 @@ fn same_face(alg: &Algorithm, mooove: u8) -> bool {
     mooove / 3 == OPPOSITE_FACES[last_move as usize / 3] && mooove / 3 == second_last_move / 3
 }
 
-pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, max_ms: u128, log: bool) -> HashSet<String> {
-    // if check_32_bit() {
-    //     return HashSet::new();
-    // }
-
+pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, log: bool) -> HashSet<String> {
     let mut depth = 0;
     let mut inverse_depth = 0;
 
@@ -166,10 +162,9 @@ mod tests {
 
         let moves = [U1_NUM, U2_NUM, U3_NUM, F1_NUM, F2_NUM, F3_NUM, R1_NUM, R2_NUM, R3_NUM];
         let max_solutions = 10;
-        let max_ms = 10_000;
         let log = false;
 
-        let solutions = run_solve(start, end, &moves, max_solutions, max_ms, log);
+        let solutions = run_solve(start, end, &moves, max_solutions, log);
         let solutions: Vec<String> = solutions.into_iter().collect();
         let expected = [
             "R U2 F' R' F U' F' R F U' R' U'",

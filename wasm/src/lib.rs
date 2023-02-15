@@ -23,7 +23,7 @@ pub fn scramble(alg: &str) -> String {
         U1_NUM, U2_NUM, U3_NUM, F1_NUM, F2_NUM, F3_NUM, R1_NUM, R2_NUM, R3_NUM,
     ];
 
-    run_solve(end, start, &moves, 10, 5_000, false)
+    run_solve(end, start, &moves, 10, false)
         .into_iter()
         .collect::<Vec<String>>()
         .join(",")
