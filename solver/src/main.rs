@@ -2,14 +2,14 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::{moves::*, cube::Cube, solve::run_solve};
 
-mod algorithm;
-mod arch;
-mod cube;
-mod moves;
-mod node;
-mod solve;
-mod queue;
-mod visited;
+pub mod algorithm;
+pub mod arch;
+pub mod cube;
+pub mod moves;
+pub mod node;
+pub mod solve;
+pub mod queue;
+pub mod visited;
 
 fn main() {
     

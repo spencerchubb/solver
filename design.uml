@@ -1,0 +1,48 @@
+@startuml
+
+class Label extends Widget {
+    +Label(String text)
+}
+
+class LabelRenderer extends Renderer {}
+
+class Button extends Widget {
+    +Button(String text)
+}
+
+class ButtonRenderer extends Renderer {}
+
+class Widget {
+    -Renderer renderer
+    +Widget(Renderer renderer)
+    +render()
+}
+
+abstract Renderer {
+    -OperatingSystem os
+    +render(): void
+    -getOS(): String
+    #abstract renderWindows(): void
+    #abstract renderUbuntu(): void
+    #abstract renderMac(): void
+}
+
+class OperatingSystem {
+    -data
+    +getOSData()
+}
+
+class Windows implements OperatingSystem {
+}
+
+class Ubuntu implements OperatingSystem {
+}
+
+class Mac implements OperatingSystem {
+}
+
+Widget --> Renderer
+
+Renderer --> OperatingSystem
+
+@enduml

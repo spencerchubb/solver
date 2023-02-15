@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>WebAssembly Demo</title>
+    <link rel="icon" type="image/svg+xml" href="https://www.rust-lang.org/static/images/favicon.svg">
+</head>
+
+<body>
+    <h1>WebAssembly Demo</h1>
+    <p>Click the button to run the WebAssembly module.</p>
+    <script type="module">
+        import init, { scramble } from "./pkg/wasm.js";
+        init().then(() => {
+            let scrambles = scramble("R U R' F' R U R' U' R' F R2 U' R' U'");
+            console.log(scrambles.split(","));
+        });
+    </script>
+</body>
+
+</html>

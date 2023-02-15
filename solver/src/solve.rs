@@ -5,7 +5,6 @@ use crate::moves::{NULL_MOVE, invert_move, build_alg_string};
 use crate::{arch::check_32_bit, cube::Cube, queue::Queue, visited::Visited, node::Node};
 
 use std::collections::HashSet;
-use std::time::{SystemTime, UNIX_EPOCH};
 
 const OPPOSITE_FACES: [u8; 6] = [2, 3, 0, 1, 5, 4];
 
@@ -30,7 +29,9 @@ fn same_face(alg: &Algorithm, mooove: u8) -> bool {
 }
 
 pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, max_ms: u128, log: bool) -> HashSet<String> {
-    check_32_bit();
+    // if check_32_bit() {
+    //     return HashSet::new();
+    // }
 
     let mut depth = 0;
     let mut inverse_depth = 0;
@@ -45,8 +46,7 @@ pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, max_m
     inverse_queue.push(Node{ cube: end, alg: Algorithm::new() });
 
     let mut solutions = HashSet::new();
-    let start_ms = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
-    while SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() - start_ms < max_ms {
+    loop {
         let node = queue.pop();
         let inverse_node = inverse_queue.pop();
 
@@ -91,8 +91,6 @@ pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, max_m
             go_to_child(&mut inverse_queue, &inverse_node, &mut inverse_visited, *mooove);
         }
     }
-
-    solutions
 }
 
 fn reconstruct_algs(seen: &mut HashSet<Cube>, visited: &Visited, cube: &Cube) -> Vec<Algorithm> {

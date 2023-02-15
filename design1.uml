@@ -1,0 +1,40 @@
+@startuml
+
+class Label extends Widget {
+    +Label(String text)
+}
+
+class LabelRenderer extends Renderer {}
+
+class Button extends Widget {
+    +Button(String text)
+}
+
+class ButtonRenderer extends Renderer {}
+
+class Widget {
+    -Renderer renderer
+    +Widget(Renderer renderer)
+    +render()
+}
+
+abstract Renderer {
+    +render(): void
+    -getOS(): String
+    #abstract getWindows(): OSRenderer
+    #abstract getUbuntu(): OSRenderer
+    #abstract getMac(): OSRenderer
+}
+
+interface OSRenderer {
+    +render(): void
+}
+
+Label -- LabelRenderer
+Button -- ButtonRenderer
+
+Widget --> Renderer
+
+Renderer -- OSRenderer
+
+@enduml

@@ -1,0 +1,12 @@
+[package]
+name = "solver"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "solver"
+path = "src/main.rs"
+
+[dependencies]
+ahash = "0.8.3"
+smallvec = "1.10.0"
