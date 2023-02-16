@@ -10,7 +10,7 @@ extern {
 }
 
 #[wasm_bindgen]
-pub fn scramble(alg: &str) -> String {
+pub fn scramble(alg: &str, moves: &str) -> String {
     log(&format!("scrambling {}", alg));
     let mut start = Cube::new();
     let end = Cube::new();
@@ -19,9 +19,7 @@ pub fn scramble(alg: &str) -> String {
     let alg = solver::moves::invert_algorithm(alg);
     start.perform_alg(alg);
 
-    let moves = [
-        U1_NUM, U2_NUM, U3_NUM, F1_NUM, F2_NUM, F3_NUM, R1_NUM, R2_NUM, R3_NUM,
-    ];
+    let moves = Moves::from_string(moves);
 
     run_solve(end, start, &moves, 10, false)
         .into_iter()

@@ -1,7 +1,7 @@
 import { scramble as wasmScramble } from "./pkg/solver_wasm";
 
-export function scramble (alg: string): string {
-    let scramblesAsStr: string = wasmScramble(alg);
+export function scramble (alg: string, moves: string): string {
+    let scramblesAsStr: string = wasmScramble(alg, moves);
     let scrambles: string[] = scramblesAsStr.split(",");
     
     return randElement(scrambles);

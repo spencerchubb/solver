@@ -1,7 +1,7 @@
 use smallvec::SmallVec;
 
 use crate::algorithm::{Algorithm};
-use crate::moves::{NULL_MOVE, invert_move, build_alg_string};
+use crate::moves::{NULL_MOVE, invert_move, build_alg_string, Moves};
 use crate::{cube::Cube, queue::Queue, visited::Visited, node::Node};
 
 use std::collections::HashSet;
@@ -28,7 +28,9 @@ fn same_face(alg: &Algorithm, mooove: u8) -> bool {
     mooove / 3 == OPPOSITE_FACES[last_move as usize / 3] && mooove / 3 == second_last_move / 3
 }
 
-pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, log: bool) -> HashSet<String> {
+// TODO make a logger interface and remove the 'log' boolean
+// TODO make a Solver struct with a 'solve' method and a 'with_logger' method
+pub fn run_solve(start: Cube, end: Cube, moves: &Moves, max_solutions: i32, log: bool) -> HashSet<String> {
     let mut depth = 0;
     let mut inverse_depth = 0;
 
@@ -82,7 +84,7 @@ pub fn run_solve(start: Cube, end: Cube, moves: &[u8], max_solutions: i32, log: 
             println!("inverse depth: {}", inverse_depth);
         }
 
-        for mooove in moves {
+        for mooove in moves.get_moves() {
             go_to_child(&mut queue, &node, &mut visited, *mooove);
             go_to_child(&mut inverse_queue, &inverse_node, &mut inverse_visited, *mooove);
         }
@@ -136,14 +138,6 @@ fn go_to_child(queue: &mut Queue<Node>, node: &Node, visited: &mut Visited, mooo
     let mut new_alg = node.alg.clone();
     new_alg.push(mooove);
 
-    // if !visited.contains(cpy) {
-    //     queue.push(Node{ cube: cpy, alg: new_alg });
-    // }
-
-    // if visited.contains(cpy) {
-    //     return;
-    // }
-
     queue.push(Node{ cube: cpy, alg: new_alg });
 
     visited.add(cpy, mooove);
@@ -160,7 +154,7 @@ mod tests {
         let end = Cube::new();
         start.perform_alg_string("R U R' F' R U R' U' R' F R2 U' R' U'");
 
-        let moves = [U1_NUM, U2_NUM, U3_NUM, F1_NUM, F2_NUM, F3_NUM, R1_NUM, R2_NUM, R3_NUM];
+        let moves = Moves::from_string("U,U2,U',F,F2,F',R,R2,R'");
         let max_solutions = 10;
         let log = false;
 

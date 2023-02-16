@@ -3,6 +3,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use crate::{moves::*, cube::Cube, solve::run_solve};
 
 pub mod algorithm;
+pub mod constants;
 pub mod cube;
 pub mod moves;
 pub mod node;
@@ -16,7 +17,7 @@ pub fn main() {
     let end = Cube::new();
     start.perform_alg_string("R U R' F' R U R' U' R' F R2 U' R' U'");
     
-    let moves = [U1_NUM, U2_NUM, U3_NUM, F1_NUM, F2_NUM, F3_NUM, R1_NUM, R2_NUM, R3_NUM];
+    let moves = Moves::from_string("U,U2,U',F,F2,F',R,R2,R'");
     let max_solutions = 100;
     let log = true;
     

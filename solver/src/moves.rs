@@ -1,16 +1,4 @@
 use crate::algorithm::{Algorithm};
-use crate::cube::{Cube, DISREGARD};
-use crate::algorithm::string_to_alg;
-
-//          00 08 01
-//          09 20 10
-//          02 11 03
-// 00 09 02 02 11 03 03 10 02 02 08 00
-// 18 24 12 12 21 13 13 25 19 19 23 18
-// 06 15 04 04 14 05 05 16 07 07 17 06
-//          04 14 05
-//          15 22 16
-//          06 17 07
 
 pub const U1_NUM: u8 = 0;
 pub const U2_NUM: u8 = 1;
@@ -39,6 +27,7 @@ pub const E3_NUM: u8 = 23;
 pub const S1_NUM: u8 = 24;
 pub const S2_NUM: u8 = 25;
 pub const S3_NUM: u8 = 26;
+// TODO: do we need this?
 pub const NULL_MOVE: u8 = 0xFF;
 
 pub const MOVE_NAMES: [&str; 27] = [
@@ -114,7 +103,6 @@ fn cancel_pair_of_moves(m1: u8, m2: u8) -> u8 {
 }
 
 pub fn build_alg_string(forward: Algorithm, inverse: Algorithm) -> String {
-    // println!("build_alg_string: {} - {}", alg_to_string(&forward), alg_to_string(&inverse));
     let mut reversed = inverse;
     reversed.reverse();
     let mut combined = forward;
@@ -142,432 +130,56 @@ pub fn build_alg_string(forward: Algorithm, inverse: Algorithm) -> String {
         .join(" ")
 }
 
-fn twist_cw(b: u8) -> u8 {
-    if b == DISREGARD {
-        return b;
-    }
-    let upper = b & 0xF0;
-    let lower = b & 0x0F;
-    ((upper + 1) % 3) << 4 | lower
+// The moves that can be performed while searching for a solution.
+// For example, the user may want to restrict solutions to the RUF moves.
+pub struct Moves {
+    moves: Vec<u8>,
 }
 
-fn twist_ccw(b: u8) -> u8 {
-    if b == DISREGARD {
-        return b;
-    }
-    let upper = b & 0xF0;
-    let lower = b & 0x0F;
-    ((upper + 2) % 3) << 4 | lower
-}
+impl Moves {
 
-fn flip(b: u8) -> u8 {
-    if b == DISREGARD {
-        return b;
-    }
-    b ^ 0b00010000
-}
-
-impl Cube {
-    pub fn perform_move(&mut self, m: u8) {
-        match m {
-            U1_NUM => self.u1(),
-            U2_NUM => self.u2(),
-            U3_NUM => self.u3(),
-            F1_NUM => self.f1(),
-            F2_NUM => self.f2(),
-            F3_NUM => self.f3(),
-            D1_NUM => self.d1(),
-            D2_NUM => self.d2(),
-            D3_NUM => self.d3(),
-            B1_NUM => self.b1(),
-            B2_NUM => self.b2(),
-            B3_NUM => self.b3(),
-            L1_NUM => self.l1(),
-            L2_NUM => self.l2(),
-            L3_NUM => self.l3(),
-            R1_NUM => self.r1(),
-            R2_NUM => self.r2(),
-            R3_NUM => self.r3(),
-            M1_NUM => self.m1(),
-            M2_NUM => self.m2(),
-            M3_NUM => self.m3(),
-            E1_NUM => self.e1(),
-            E2_NUM => self.e2(),
-            E3_NUM => self.e3(),
-            S1_NUM => self.s1(),
-            S2_NUM => self.s2(),
-            S3_NUM => self.s3(),
-            _ => panic!("Invalid move number: {}", m),
+    // This function accepts a string of comma-separated move names.
+    // Example: "U,U2,U',F,F2,F',R,R2,R'"
+    pub fn from_string(s: &str) -> Moves {
+        let mut moves = Vec::new();
+        for m in s.split(',') {
+            match m {
+                "U" => moves.push(U1_NUM),
+                "U2" => moves.push(U2_NUM),
+                "U'" => moves.push(U3_NUM),
+                "F" => moves.push(F1_NUM),
+                "F2" => moves.push(F2_NUM),
+                "F'" => moves.push(F3_NUM),
+                "D" => moves.push(D1_NUM),
+                "D2" => moves.push(D2_NUM),
+                "D'" => moves.push(D3_NUM),
+                "B" => moves.push(B1_NUM),
+                "B2" => moves.push(B2_NUM),
+                "B'" => moves.push(B3_NUM),
+                "L" => moves.push(L1_NUM),
+                "L2" => moves.push(L2_NUM),
+                "L'" => moves.push(L3_NUM),
+                "R" => moves.push(R1_NUM),
+                "R2" => moves.push(R2_NUM),
+                "R'" => moves.push(R3_NUM),
+                _ => panic!("invalid move: {}", m),
+            }
         }
+        Moves { moves }
     }
 
-    pub fn perform_alg(&mut self, alg: Algorithm) {
-        for m in alg {
-            self.perform_move(m);
-        }
-    }
-
-    pub fn perform_alg_string(&mut self, alg_string: &str) {
-        let alg: Algorithm = string_to_alg(alg_string);
-        self.perform_alg(alg);
-    }
-
-    fn u1(&mut self) {
-        let temp = self.state[0];
-        self.state[0] = self.state[2];
-        self.state[2] = self.state[3];
-        self.state[3] = self.state[1];
-        self.state[1] = temp;
-
-        let temp = self.state[8];
-        self.state[8] = self.state[9];
-        self.state[9] = self.state[11];
-        self.state[11] = self.state[10];
-        self.state[10] = temp;
-    }
-
-    fn u2(&mut self) {
-        self.state.swap(0, 3);
-        self.state.swap(1, 2);
-        self.state.swap(8, 11);
-        self.state.swap(9, 10);
-    }
-
-    fn u3(&mut self) {
-        let temp = self.state[0];
-        self.state[0] = self.state[1];
-        self.state[1] = self.state[3];
-        self.state[3] = self.state[2];
-        self.state[2] = temp;
-
-        let temp = self.state[8];
-        self.state[8] = self.state[10];
-        self.state[10] = self.state[11];
-        self.state[11] = self.state[9];
-        self.state[9] = temp;
-    }
-
-    fn f1(&mut self) {
-        let temp = self.state[2];
-        self.state[2] = twist_ccw(self.state[4]);
-        self.state[4] = twist_cw(self.state[5]);
-        self.state[5] = twist_ccw(self.state[3]);
-        self.state[3] = twist_cw(temp);
-
-        let temp = self.state[11];
-        self.state[11] = flip(self.state[12]);
-        self.state[12] = flip(self.state[14]);
-        self.state[14] = flip(self.state[13]);
-        self.state[13] = flip(temp);
-    }
-
-    fn f2(&mut self) {
-        self.state.swap(2, 5);
-        self.state.swap(3, 4);
-        self.state.swap(11, 14);
-        self.state.swap(12, 13);
-    }
-
-    fn f3(&mut self) {
-        let temp = self.state[2];
-        self.state[2] = twist_ccw(self.state[3]);
-        self.state[3] = twist_cw(self.state[5]);
-        self.state[5] = twist_ccw(self.state[4]);
-        self.state[4] = twist_cw(temp);
-
-        let temp = self.state[11];
-        self.state[11] = flip(self.state[13]);
-        self.state[13] = flip(self.state[14]);
-        self.state[14] = flip(self.state[12]);
-        self.state[12] = flip(temp);
-    }
-
-    fn d1(&mut self) {
-        let temp = self.state[4];
-        self.state[4] = self.state[6];
-        self.state[6] = self.state[7];
-        self.state[7] = self.state[5];
-        self.state[5] = temp;
-
-        let temp = self.state[14];
-        self.state[14] = self.state[15];
-        self.state[15] = self.state[17];
-        self.state[17] = self.state[16];
-        self.state[16] = temp;
-    }
-
-    fn d2(&mut self) {
-        self.state.swap(4, 7);
-        self.state.swap(5, 6);
-        self.state.swap(14, 17);
-        self.state.swap(15, 16);
-    }
-
-    fn d3(&mut self) {
-        let temp = self.state[4];
-        self.state[4] = self.state[5];
-        self.state[5] = self.state[7];
-        self.state[7] = self.state[6];
-        self.state[6] = temp;
-
-        let temp = self.state[14];
-        self.state[14] = self.state[16];
-        self.state[16] = self.state[17];
-        self.state[17] = self.state[15];
-        self.state[15] = temp;
-    }
-
-    fn b1(&mut self) {
-        let temp = self.state[0];
-        self.state[0] = twist_cw(self.state[1]);
-        self.state[1] = twist_ccw(self.state[7]);
-        self.state[7] = twist_cw(self.state[6]);
-        self.state[6] = twist_ccw(temp);
-
-        let temp = self.state[8];
-        self.state[8] = flip(self.state[19]);
-        self.state[19] = flip(self.state[17]);
-        self.state[17] = flip(self.state[18]);
-        self.state[18] = flip(temp);
-    }
-
-    fn b2(&mut self) {
-        self.state.swap(0, 7);
-        self.state.swap(1, 6);
-        self.state.swap(8, 17);
-        self.state.swap(18, 19);
-    }
-
-    fn b3(&mut self) {
-        let temp = self.state[0];
-        self.state[0] = twist_cw(self.state[6]);
-        self.state[6] = twist_ccw(self.state[7]);
-        self.state[7] = twist_cw(self.state[1]);
-        self.state[1] = twist_ccw(temp);
-
-        let temp = self.state[8];
-        self.state[8] = flip(self.state[18]);
-        self.state[18] = flip(self.state[17]);
-        self.state[17] = flip(self.state[19]);
-        self.state[19] = flip(temp);
-    }
-
-    fn l1(&mut self) {
-        let temp = self.state[0];
-        self.state[0] = twist_ccw(self.state[6]);
-        self.state[6] = twist_cw(self.state[4]);
-        self.state[4] = twist_ccw(self.state[2]);
-        self.state[2] = twist_cw(temp);
-
-        let temp = self.state[9];
-        self.state[9] = self.state[18];
-        self.state[18] = self.state[15];
-        self.state[15] = self.state[12];
-        self.state[12] = temp;
-    }
-
-    fn l2(&mut self) {
-        self.state.swap(0, 4);
-        self.state.swap(2, 6);
-        self.state.swap(9, 15);
-        self.state.swap(12, 18);
-    }
-
-    fn l3(&mut self) {
-        let temp = self.state[0];
-        self.state[0] = twist_ccw(self.state[2]);
-        self.state[2] = twist_cw(self.state[4]);
-        self.state[4] = twist_ccw(self.state[6]);
-        self.state[6] = twist_cw(temp);
-
-        let temp = self.state[9];
-        self.state[9] = self.state[12];
-        self.state[12] = self.state[15];
-        self.state[15] = self.state[18];
-        self.state[18] = temp;
-    }
-
-    fn r1(&mut self) {
-        let temp = self.state[1];
-        self.state[1] = twist_cw(self.state[3]);
-        self.state[3] = twist_ccw(self.state[5]);
-        self.state[5] = twist_cw(self.state[7]);
-        self.state[7] = twist_ccw(temp);
-
-        let temp = self.state[10];
-        self.state[10] = self.state[13];
-        self.state[13] = self.state[16];
-        self.state[16] = self.state[19];
-        self.state[19] = temp;
-    }
-
-    fn r2(&mut self) {
-        self.state.swap(1, 5);
-        self.state.swap(3, 7);
-        self.state.swap(10, 16);
-        self.state.swap(13, 19);
-    }
-
-    fn r3(&mut self) {
-        let temp = self.state[1];
-        self.state[1] = twist_cw(self.state[7]);
-        self.state[7] = twist_ccw(self.state[5]);
-        self.state[5] = twist_cw(self.state[3]);
-        self.state[3] = twist_ccw(temp);
-
-        let temp = self.state[10];
-        self.state[10] = self.state[19];
-        self.state[19] = self.state[16];
-        self.state[16] = self.state[13];
-        self.state[13] = temp;
-    }
-
-    fn m1(&mut self) {
-        let temp = self.state[8];
-        self.state[8] = flip(self.state[17]);
-        self.state[17] = flip(self.state[14]);
-        self.state[14] = flip(self.state[11]);
-        self.state[11] = flip(temp);
-
-        let temp = self.state[20];
-        self.state[20] = self.state[23];
-        self.state[23] = self.state[22];
-        self.state[22] = self.state[21];
-        self.state[21] = temp;
-    }
-
-    fn m2(&mut self) {
-        self.state.swap(8, 14);
-        self.state.swap(11, 17);
-        self.state.swap(20, 22);
-        self.state.swap(21, 23);
-    }
-
-    fn m3(&mut self) {
-        let temp = self.state[8];
-        self.state[8] = flip(self.state[11]);
-        self.state[11] = flip(self.state[14]);
-        self.state[14] = flip(self.state[17]);
-        self.state[17] = flip(temp);
-
-        let temp = self.state[20];
-        self.state[20] = self.state[21];
-        self.state[21] = self.state[22];
-        self.state[22] = self.state[23];
-        self.state[23] = temp;
-    }
-
-    fn e1(&mut self) {
-        let temp = self.state[12];
-        self.state[12] = flip(self.state[18]);
-        self.state[18] = flip(self.state[19]);
-        self.state[19] = flip(self.state[13]);
-        self.state[13] = flip(temp);
-
-        let temp = self.state[21];
-        self.state[21] = self.state[24];
-        self.state[24] = self.state[23];
-        self.state[23] = self.state[25];
-        self.state[25] = temp;
-    }
-
-    fn e2(&mut self) {
-        self.state.swap(12, 19);
-        self.state.swap(13, 18);
-        self.state.swap(21, 23);
-        self.state.swap(24, 25);
-    }
-
-    fn e3(&mut self) {
-        let temp = self.state[12];
-        self.state[12] = flip(self.state[13]);
-        self.state[13] = flip(self.state[19]);
-        self.state[19] = flip(self.state[18]);
-        self.state[18] = flip(temp);
-
-        let temp = self.state[21];
-        self.state[21] = self.state[25];
-        self.state[25] = self.state[23];
-        self.state[23] = self.state[24];
-        self.state[24] = temp;
-    }
-
-    fn s1(&mut self) {
-        let temp = self.state[9];
-        self.state[9] = flip(self.state[15]);
-        self.state[15] = flip(self.state[16]);
-        self.state[16] = flip(self.state[10]);
-        self.state[10] = flip(temp);
-
-        let temp = self.state[20];
-        self.state[20] = self.state[24];
-        self.state[24] = self.state[22];
-        self.state[22] = self.state[25];
-        self.state[25] = temp;
-    }
-
-    fn s2(&mut self) {
-        self.state.swap(9, 16);
-        self.state.swap(10, 15);
-        self.state.swap(20, 22);
-        self.state.swap(24, 25);
-    }
-
-    fn s3(&mut self) {
-        let temp = self.state[9];
-        self.state[9] = flip(self.state[10]);
-        self.state[10] = flip(self.state[16]);
-        self.state[16] = flip(self.state[15]);
-        self.state[15] = flip(temp);
-
-        let temp = self.state[20];
-        self.state[20] = self.state[25];
-        self.state[25] = self.state[22];
-        self.state[22] = self.state[24];
-        self.state[24] = temp;
+    pub fn get_moves(&self) -> &Vec<u8> {
+        &self.moves
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::moves::*;
 
     #[test]
-    fn test_random() {
-        let mut c1 = Cube::new();
-        let c2 = Cube::new();
-
-        // Scramble
-        c1.perform_alg_string("R F B2 U2 B' L' D F' B L2 D2 R2 U R' D' F2 U' L");
-
-        // Cross
-        c1.perform_alg_string("R D2 L2");
-
-        // Pair 1
-        c1.perform_alg_string("D F D' F' D F' D2 F");
-
-        // Pair 2
-        c1.perform_alg_string("D2 R' D R");
-
-        // Pair 3+4
-        c1.perform_alg_string("L' D' L D' B D B2 D' B D' R D R'");
-
-        // OLL
-        c1.perform_alg_string("B' D' L' D L B");
-
-        // PLL
-        c1.perform_alg_string("R D R' D R D R' B' R D R' D' R' B R2 D' R' D2 R D' R'");
-
-        assert_eq!(c1.state, c2.state);
-    }
-
-    #[test]
-    fn test_slice() {
-        let mut c1 = Cube::new();
-        let c2 = Cube::new();
-
-        c1.perform_alg_string("M E S M' S2 E' M2 S' E2 S M2 S E2");
-
-        assert_eq!(c1.state, c2.state);
+    fn test_moves() {
+        let moves = Moves::from_string("U,U2,U',F,F2,F',R,R2,R'");
+        assert_eq!(*moves.get_moves(), vec![U1_NUM, U2_NUM, U3_NUM, F1_NUM, F2_NUM, F3_NUM, R1_NUM, R2_NUM, R3_NUM]);
     }
 }

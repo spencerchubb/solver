@@ -1,6 +1,6 @@
 import { scramble as wasmScramble } from "./pkg/solver_wasm";
-export function scramble(alg) {
-    var scramblesAsStr = wasmScramble(alg);
+export function scramble(alg, moves) {
+    var scramblesAsStr = wasmScramble(alg, moves);
     var scrambles = scramblesAsStr.split(",");
     return randElement(scrambles);
 }
