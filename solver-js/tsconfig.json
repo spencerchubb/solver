@@ -1,6 +1,7 @@
 {
     "include": [
         "./index.ts",
+        "./pkg/**/*",
     ],
     "exclude": [],
     "compilerOptions": {

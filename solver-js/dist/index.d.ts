@@ -1,6 +1,2 @@
-type WasmObject = {
-    scramble: (alg: string) => string;
-};
-export declare function init(path: string): Promise<WasmObject>;
-export {};
+export declare function scramble(alg: string): string;
 //# sourceMappingURL=index.d.ts.map

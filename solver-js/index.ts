@@ -1,18 +1,7 @@
-let wasm;
+import { scramble as wasmScramble } from "./pkg/solver_wasm";
 
-type WasmObject = {
-    scramble: (alg: string) => string,
-};
-
-export async function init(path: string): Promise<WasmObject> {
-    wasm = await import(path);
-    return {
-        scramble,
-    }
-}
-
-function scramble (alg: string): string {
-    let scramblesAsStr: string = wasm.scramble(alg);
+export function scramble (alg: string): string {
+    let scramblesAsStr: string = wasmScramble(alg);
     let scrambles: string[] = scramblesAsStr.split(",");
     
     return randElement(scrambles);
