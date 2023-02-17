@@ -1,7 +1,13 @@
 use crate::cube::Cube;
 
-use std::collections::HashMap;
+// According to my tests, it seems that ahash is the fastest out of these hash functions:
+// - ahash
+// - cityhash-sys
+// - twox-hash
+// - Rust's default hash function
 use ahash::random_state::RandomState;
+
+use std::collections::HashMap;
 use smallvec::SmallVec;
 
 pub struct Visited {
