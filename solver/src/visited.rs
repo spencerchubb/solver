@@ -28,6 +28,10 @@ impl Visited {
     pub fn get(&self, cube: Cube) -> SmallVec<[u8; 1]> {
         self.data.get(&cube.state).cloned().unwrap_or(SmallVec::new())
     }
+
+    pub fn contains(&self, cube: &Cube) -> bool {
+        self.data.contains_key(&cube.state)
+    }
 }
 
 #[cfg(test)]

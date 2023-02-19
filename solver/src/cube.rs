@@ -12,6 +12,7 @@ use crate::{algorithm::{Algorithm, string_to_alg}, constants::DISREGARD, moves::
 //          06 17 07
 
 // TODO: set pieces to ignore, and set pieces that only care about orientation
+// TODO: disregard centers while searching for solution. hopefully will improve performance
 
 #[derive(Copy, Clone)]
 #[derive(PartialEq, Eq, Hash)]

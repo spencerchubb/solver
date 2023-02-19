@@ -6,31 +6,11 @@ use crate::{cube::Cube, queue::Queue, visited::Visited, node::Node};
 
 use std::collections::HashSet;
 
-const OPPOSITE_FACES: [u8; 6] = [2, 3, 0, 1, 5, 4];
+type NextMoveValid = fn(&Algorithm, u8) -> bool;
 
-fn same_face(alg: &Algorithm, mooove: u8) -> bool {
-    if alg.is_empty() {
-        return false;
-    }
-
-    let last_move = alg[alg.len() - 1];
-
-    if last_move / 3 == mooove / 3 {
-        return true;
-    }
-
-    if alg.len() == 1 {
-        return false;
-    }
-
-    let second_last_move = alg[alg.len() - 2];
-
-    mooove / 3 == OPPOSITE_FACES[last_move as usize / 3] && mooove / 3 == second_last_move / 3
-}
-
-// TODO make a logger interface and remove the 'log' boolean
+// TODO make a logger interface
 // TODO make a Solver struct with a 'solve' method and a 'with_logger' method
-pub fn run_solve(start: Cube, end: Cube, moves: &Moves, max_solutions: i32, log: bool) -> HashSet<String> {
+pub fn run_solve(start: Cube, end: Cube, moves: &Moves, next_move_valid: NextMoveValid, max_solutions: i32) -> HashSet<String> {
     let mut depth = 0;
     let mut inverse_depth = 0;
 
@@ -54,7 +34,7 @@ pub fn run_solve(start: Cube, end: Cube, moves: &Moves, max_solutions: i32, log:
             let mut inverse_node_alg = inverse_node.alg.clone();
             inverse_node_alg.reverse();
             let alg_str = build_alg_string(inverse_node.alg.clone(), alg);
-            if log && !solutions.contains(&alg_str) {
+            if !solutions.contains(&alg_str) {
                 println!("{}", alg_str);
             }
             solutions.insert(alg_str);
@@ -64,7 +44,7 @@ pub fn run_solve(start: Cube, end: Cube, moves: &Moves, max_solutions: i32, log:
         let algs = reconstruct_algs(&mut seen, &inverse_visited, &node.cube);
         for alg in algs {
             let alg_str = build_alg_string(node.alg.clone(), alg);
-            if log && !solutions.contains(&alg_str) {
+            if !solutions.contains(&alg_str) {
                 println!("{}", alg_str);
             }
             solutions.insert(alg_str);
@@ -74,19 +54,23 @@ pub fn run_solve(start: Cube, end: Cube, moves: &Moves, max_solutions: i32, log:
             return solutions;
         }
 
-        if log && node.alg.len() > depth {
+        if node.alg.len() > depth {
             depth = node.alg.len();
             println!("depth: {}", depth);
         }
 
-        if log && inverse_node.alg.len() > inverse_depth {
+        if inverse_node.alg.len() > inverse_depth {
             inverse_depth = inverse_node.alg.len();
             println!("inverse depth: {}", inverse_depth);
         }
 
         for mooove in moves.get_moves() {
-            go_to_child(&mut queue, &node, &mut visited, *mooove);
-            go_to_child(&mut inverse_queue, &inverse_node, &mut inverse_visited, *mooove);
+            if next_move_valid(&node.alg, *mooove) {
+                go_to_child(&mut queue, &node, &mut visited, *mooove);
+            }
+            if next_move_valid(&inverse_node.alg, *mooove) {
+                go_to_child(&mut inverse_queue, &inverse_node, &mut inverse_visited, *mooove);
+            }
         }
     }
 }
@@ -129,11 +113,12 @@ fn reconstruct_algs(seen: &mut HashSet<Cube>, visited: &Visited, cube: &Cube) ->
 }
 
 fn go_to_child(queue: &mut Queue<Node>, node: &Node, visited: &mut Visited, mooove: u8) {
-    if same_face(&node.alg, mooove) {
-        return;
-    }
     let mut cpy = node.cube;
     cpy.perform_move(mooove);
+    
+    if visited.contains(&cpy) {
+        return;
+    }
 
     let mut new_alg = node.alg.clone();
     new_alg.push(mooove);
@@ -156,9 +141,8 @@ mod tests {
 
         let moves = Moves::from_string("U,U2,U',F,F2,F',R,R2,R'");
         let max_solutions = 10;
-        let log = false;
 
-        let solutions = run_solve(start, end, &moves, max_solutions, log);
+        let solutions = run_solve(start, end, &moves, |_, _| true, max_solutions);
         let solutions: Vec<String> = solutions.into_iter().collect();
         let expected = [
             "R U2 F' R' F U' F' R F U' R' U'",
