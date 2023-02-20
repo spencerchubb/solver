@@ -79,6 +79,24 @@ impl Cube {
         self.perform_alg(alg);
     }
 
+    // pieces is an array of piece indices.
+    // This function makes it so we only consider the orientation of the pieces.
+    // The way this works is by settings the 5th-8th bits to 1.
+    // This means that the permutation is disregarded.
+    pub fn set_only_orientation(&mut self, pieces: &[usize]) {
+        for i in pieces {
+            self.state[*i] |= 0x0F;
+        }
+    }
+
+    // pieces is an array of pieces indices.
+    // This function makes it so the pieces are disregarded.
+    pub fn set_disregard(&mut self, pieces: &[usize]) {
+        for i in pieces {
+            self.state[*i] |= DISREGARD;
+        }
+    }
+
     fn u1(&mut self) {
         let temp = self.state[0];
         self.state[0] = self.state[2];

@@ -1,7 +1,7 @@
 use smallvec::SmallVec;
 
 use crate::algorithm::{Algorithm};
-use crate::moves::{NULL_MOVE, invert_move, build_alg_string, Moves};
+use crate::moves::{NULL_MOVE, invert_move, Moves};
 use crate::{cube::Cube, queue::Queue, visited::Visited, node::Node};
 
 use std::collections::HashSet;
@@ -33,21 +33,26 @@ pub fn run_solve(start: Cube, end: Cube, moves: &Moves, next_move_valid: NextMov
         for alg in algs {
             let mut inverse_node_alg = inverse_node.alg.clone();
             inverse_node_alg.reverse();
-            let alg_str = build_alg_string(inverse_node.alg.clone(), alg);
-            if !solutions.contains(&alg_str) {
+            let mut alg = alg.clone();
+            alg.reverse();
+            let alg_str = crate::moves::combine_algs(inverse_node.alg.clone(), alg);
+            if solutions.insert(alg_str.clone()) {
                 println!("{}", alg_str);
             }
-            solutions.insert(alg_str);
         }
 
         let mut seen: HashSet<Cube> = HashSet::new();
         let algs = reconstruct_algs(&mut seen, &inverse_visited, &node.cube);
         for alg in algs {
-            let alg_str = build_alg_string(node.alg.clone(), alg);
-            if !solutions.contains(&alg_str) {
+            let mut alg = alg.clone();
+            alg = crate::moves::invert_algorithm(alg);
+            alg.reverse();
+            let mut node_alg = node.alg.clone();
+            node_alg = crate::moves::invert_algorithm(node_alg);
+            let alg_str = crate::moves::combine_algs(alg, node_alg);
+            if solutions.insert(alg_str.clone()) {
                 println!("{}", alg_str);
             }
-            solutions.insert(alg_str);
         }
 
         if solutions.len() >= max_solutions as usize {

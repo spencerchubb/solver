@@ -119,24 +119,26 @@ pub fn string_to_alg(alg_string: &str) -> Algorithm {
     alg
 }
 
+const OPPOSITES: [u8; 6] = [2, 3, 0, 1, 5, 4];
+
 pub fn same_face(alg: &Algorithm, mooove: u8) -> bool {
     if alg.is_empty() {
-        return true;
+        return false;
     }
 
     let last_move = alg[alg.len() - 1];
 
     if last_move / 3 == mooove / 3 {
-        return false;
+        return true;
     }
 
     if alg.len() == 1 {
-        return true;
+        return false;
     }
 
     let second_last_move = alg[alg.len() - 2];
 
-    mooove / 3 != [2, 3, 0, 1, 5, 4][last_move as usize / 3] || mooove / 3 != second_last_move / 3
+    mooove / 3 == OPPOSITES[last_move as usize / 3] && mooove / 3 == second_last_move / 3
 }
 
 pub fn different_face_or_same_move(alg: &Algorithm, mooove: u8) -> bool {

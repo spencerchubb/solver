@@ -102,11 +102,9 @@ fn cancel_pair_of_moves(m1: u8, m2: u8) -> u8 {
     EQUIVALENCES[m1 as usize][m2 as usize % 3]
 }
 
-pub fn build_alg_string(forward: Algorithm, inverse: Algorithm) -> String {
-    let mut reversed = inverse;
-    reversed.reverse();
+pub fn combine_algs(forward: Algorithm, inverse: Algorithm) -> String {
     let mut combined = forward;
-    combined.extend(reversed);
+    combined.extend(inverse);
     let mut cleaned: Vec<u8> = Vec::new();
     for m in combined {
         let len = cleaned.len();
