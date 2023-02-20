@@ -8,9 +8,7 @@ use std::collections::HashSet;
 
 type NextMoveValid = fn(&Algorithm, u8) -> bool;
 
-// TODO make a logger interface
-// TODO make a Solver struct with a 'solve' method and a 'with_logger' method
-pub fn run_solve(start: Cube, end: Cube, moves: &Moves, next_move_valid: NextMoveValid, max_solutions: i32) -> HashSet<String> {
+pub fn solve(start: Cube, end: Cube, moves: &Moves, next_move_valid: NextMoveValid, max_solutions: i32) -> HashSet<String> {
     let mut depth = 0;
     let mut inverse_depth = 0;
 
@@ -147,7 +145,7 @@ mod tests {
         let moves = Moves::from_string("U,U2,U',F,F2,F',R,R2,R'");
         let max_solutions = 10;
 
-        let solutions = run_solve(start, end, &moves, |_, _| true, max_solutions);
+        let solutions = solve(start, end, &moves, |_, _| true, max_solutions);
         let solutions: Vec<String> = solutions.into_iter().collect();
         let expected = [
             "R U2 F' R' F U' F' R F U' R' U'",

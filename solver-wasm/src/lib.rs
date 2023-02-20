@@ -1,4 +1,4 @@
-use solver::{cube::Cube, moves::*, solve::run_solve, algorithm::{Algorithm, different_face_or_same_move}};
+use solver::{cube::Cube, moves::*, solve::solve, algorithm::{Algorithm, different_face_or_same_move}};
 
 use wasm_bindgen::prelude::*;
 
@@ -25,7 +25,7 @@ pub fn scramble(alg: &str, moves: &str) -> String {
 
     let moves = Moves::from_string(moves);
 
-    run_solve(end, start, &moves, next_move_valid, 10)
+    solve(end, start, &moves, next_move_valid, 10)
         .into_iter()
         .collect::<Vec<String>>()
         .join(",")

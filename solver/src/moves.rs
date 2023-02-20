@@ -169,6 +169,16 @@ impl Moves {
     pub fn get_moves(&self) -> &Vec<u8> {
         &self.moves
     }
+
+    // Returns true if the moves contain one or more double moves.
+    pub fn has_double(&self) -> bool {
+        for m in &self.moves {
+            if m % 3 == 1 {
+                return true;
+            }
+        }
+        false
+    }
 }
 
 #[cfg(test)]
