@@ -6,9 +6,9 @@ use crate::{cube::Cube, queue::Queue, visited::Visited, node::Node};
 
 use std::collections::HashSet;
 
-type NextMoveValid = fn(&Algorithm, u8) -> bool;
+type MoveValid = fn(&Algorithm, u8) -> bool;
 
-pub fn solve(start: Cube, end: Cube, moves: &Moves, next_move_valid: NextMoveValid, max_solutions: i32) -> HashSet<String> {
+pub fn solve(start: Cube, end: Cube, moves: &Moves, move_valid: MoveValid, max_solutions: i32) -> HashSet<String> {
     let mut depth = 0;
     let mut inverse_depth = 0;
 
@@ -68,10 +68,10 @@ pub fn solve(start: Cube, end: Cube, moves: &Moves, next_move_valid: NextMoveVal
         }
 
         for mooove in moves.get_moves() {
-            if next_move_valid(&node.alg, *mooove) {
+            if move_valid(&node.alg, *mooove) {
                 go_to_child(&mut queue, &node, &mut visited, *mooove);
             }
-            if next_move_valid(&inverse_node.alg, *mooove) {
+            if move_valid(&inverse_node.alg, *mooove) {
                 go_to_child(&mut inverse_queue, &inverse_node, &mut inverse_visited, *mooove);
             }
         }

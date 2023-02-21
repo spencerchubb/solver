@@ -12,12 +12,16 @@ pub mod visited;
 
 pub fn main() {
     // let alg = "R U R' F' R U R' U' R' F R2 U' R' U'";
-    let alg = "R U R' F' R U R' U' R' F R U' R' F R F'";
+    // let alg = "R U R' F' R U R' U' R' F R U' R' F R F'";
+    let alg = "F R U R' U' R U' R' U' R U R' F'";
 
     let moves = "U,U',F,F',R,R'";
 
-    // let only_orientation = &[];
-    let only_orientation = &[0, 1, 2, 3, 4, 5, 6, 7, 8];
+    let only_orientation = &[];
+    // let only_orientation = &[0, 1, 2, 3, 8, 9, 10, 11];
+
+    // let disregard = &[];
+    let disregard = &[8, 9, 10, 11];
 
     let max_solutions = 10;
 
@@ -26,7 +30,7 @@ pub fn main() {
         .unwrap()
         .as_millis();
 
-    scramble::scramble(alg, &moves, only_orientation, max_solutions);
+    scramble::scramble(alg, &moves, only_orientation, disregard, max_solutions);
 
     let elapsed = SystemTime::now()
         .duration_since(UNIX_EPOCH)

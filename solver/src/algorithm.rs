@@ -121,27 +121,27 @@ pub fn string_to_alg(alg_string: &str) -> Algorithm {
 
 const OPPOSITES: [u8; 6] = [2, 3, 0, 1, 5, 4];
 
-pub fn same_face(alg: &Algorithm, mooove: u8) -> bool {
+pub fn move_valid_double(alg: &Algorithm, mooove: u8) -> bool {
     if alg.is_empty() {
-        return false;
+        return true;
     }
 
     let last_move = alg[alg.len() - 1];
 
     if last_move / 3 == mooove / 3 {
-        return true;
+        return false;
     }
 
     if alg.len() == 1 {
-        return false;
+        return true;
     }
 
     let second_last_move = alg[alg.len() - 2];
 
-    mooove / 3 == OPPOSITES[last_move as usize / 3] && mooove / 3 == second_last_move / 3
+    mooove / 3 != OPPOSITES[last_move as usize / 3] || mooove / 3 != second_last_move / 3
 }
 
-pub fn different_face_or_same_move(alg: &Algorithm, mooove: u8) -> bool {
+pub fn move_valid_single(alg: &Algorithm, mooove: u8) -> bool {
     if alg.is_empty() {
         return true;
     }
