@@ -13,7 +13,7 @@
     "vite": "^4.1.0"
   },
   "dependencies": {
-    "@spencerchubb/solver": "^0.0.7",
+    "@spencerchubb/solver": "^0.0.8",
     "solver-wasm": "^0.1.0",
     "vite-plugin-top-level-await": "^1.2.4",
     "vite-plugin-wasm": "^3.2.1"
