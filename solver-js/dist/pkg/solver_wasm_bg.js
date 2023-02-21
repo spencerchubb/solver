@@ -109,6 +109,22 @@ function passStringToWasm0(arg, malloc, realloc) {
     return ptr;
 }
 
+let cachedUint32Memory0 = null;
+
+function getUint32Memory0() {
+    if (cachedUint32Memory0 === null || cachedUint32Memory0.byteLength === 0) {
+        cachedUint32Memory0 = new Uint32Array(wasm.memory.buffer);
+    }
+    return cachedUint32Memory0;
+}
+
+function passArray32ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 4);
+    getUint32Memory0().set(arg, ptr / 4);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+
 let cachedInt32Memory0 = null;
 
 function getInt32Memory0() {
@@ -120,16 +136,22 @@ function getInt32Memory0() {
 /**
 * @param {string} alg
 * @param {string} moves
+* @param {Uint32Array} only_orientation
+* @param {Uint32Array} disregard
 * @returns {string}
 */
-export function scramble(alg, moves) {
+export function scramble(alg, moves, only_orientation, disregard) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passStringToWasm0(alg, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         const ptr1 = passStringToWasm0(moves, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len1 = WASM_VECTOR_LEN;
-        wasm.scramble(retptr, ptr0, len0, ptr1, len1);
+        const ptr2 = passArray32ToWasm0(only_orientation, wasm.__wbindgen_malloc);
+        const len2 = WASM_VECTOR_LEN;
+        const ptr3 = passArray32ToWasm0(disregard, wasm.__wbindgen_malloc);
+        const len3 = WASM_VECTOR_LEN;
+        wasm.scramble(retptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);

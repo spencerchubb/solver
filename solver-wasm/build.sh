@@ -1,3 +1,5 @@
+#!/bin/sh
+
 wasm-pack build --target bundler
 rm pkg/.gitignore
 rm pkg/package.json
