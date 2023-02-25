@@ -1,12 +1,20 @@
-import { scramble as wasmScramble } from "./pkg/solver_wasm";
 export function scramble(alg, moves, onlyOrientation, disregard) {
     return new Promise(function (resolve) {
-        execNonBlocking(function () {
-            var result = wasmScramble(alg, moves, new Uint32Array(onlyOrientation), new Uint32Array(disregard));
-            resolve(result);
+        var worker = new Worker(new URL("./worker", import.meta.url));
+        worker.onmessage = function (event) {
+            resolve(event.data);
+            worker.terminate();
+        };
+        worker.onerror = function (event) {
+            console.log("Caught error");
+            console.error(event);
+            worker.terminate();
+        };
+        worker.postMessage({
+            alg: alg,
+            moves: moves,
+            onlyOrientation: onlyOrientation,
+            disregard: disregard
         });
     });
-}
-function execNonBlocking(func) {
-    setTimeout(func, 0);
 }

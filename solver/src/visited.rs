@@ -5,19 +5,21 @@ use crate::cube::Cube;
 // - cityhash-sys
 // - twox-hash
 // - Rust's default hash function
-use ahash::random_state::RandomState;
+
+// TODO: Figure out how to use ahash with wasm. (And if it's even faster on wasm.)
+// use ahash::random_state::RandomState;
 
 use std::collections::HashMap;
 use smallvec::SmallVec;
 
 pub struct Visited {
-    data: HashMap<[u8; 26], SmallVec<[u8; 1]>, RandomState>,
+    data: HashMap<[u8; 26], SmallVec<[u8; 1]>>,
 }
 
 impl Visited {
     pub fn new() -> Visited {
         Visited {
-            data: HashMap::with_capacity_and_hasher(1_000_000, RandomState::new()),
+            data: HashMap::with_capacity(1_000_000),
         }
     }
 

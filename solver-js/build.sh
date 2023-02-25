@@ -1,5 +1,6 @@
 #!/bin/sh
 
-npm run build
-rm -rf ./dist/pkg
-cp -r pkg/ ./dist/
+rm -rf dist/
+tsc
+cp src/worker.js dist/worker.js
+cp -r src/pkg/ dist/pkg/

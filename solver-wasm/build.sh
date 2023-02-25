@@ -1,6 +1,7 @@
 #!/bin/sh
 
-wasm-pack build --target bundler
+cargo build --target wasm32-unknown-unknown
+wasm-pack build --target web
 rm pkg/.gitignore
 rm pkg/package.json
 rm pkg/README.md

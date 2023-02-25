@@ -1,6 +1,6 @@
 {
     "include": [
-        "./index.ts",
+        "src/index.ts",
         "./pkg/**/*",
     ],
     "exclude": [],

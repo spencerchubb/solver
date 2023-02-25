@@ -16,6 +16,5 @@ pub fn scramble(alg: &str, moves: &str, only_orientation: &[usize], disregard: &
     let scrambles = solver::scramble::scramble(alg, moves, only_orientation, disregard, max_scrambles);
 
     let scrambles = scrambles.into_iter().collect::<Vec<String>>();
-    let rand_index = rand::random::<usize>() % scrambles.len();
-    scrambles[rand_index].to_string()
+    scrambles.join(",")
 }
