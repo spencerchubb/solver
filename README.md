@@ -1,6 +1,6 @@
-# solver
+# [try the demo](https://spencerchubb.github.io/solver/demo/)
 
-A Rubik's Cube solver for Rust and Javascript.
+This repository is a Rubik's Cube solver for Rust and Javascript.
 
 # Explanation of directories
 - demo: An example of how to use the npm package @spencerchubb/solver
