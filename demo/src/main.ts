@@ -1,4 +1,4 @@
-import { scramble } from "./dist/index";
+import { scramble } from "@spencerchubb/solver";
 
 document.querySelector("#button-generate")?.addEventListener("click", () => {
     const alg = (document.querySelector("#input-alg") as HTMLInputElement).value;
@@ -21,7 +21,14 @@ document.querySelector("#button-generate")?.addEventListener("click", () => {
 
     const startTime = Date.now();
 
-    scramble(alg, moves, onlyOrientation, disregard, maxSolutions).then((scrambles) => {
+    const scrambleOpts = {
+        alg,
+        moves,
+        onlyOrientation,
+        disregard,
+        maxSolutions,
+    };
+    scramble(scrambleOpts).then((scrambles) => {
         const elapsedTime = Date.now() - startTime;
         root?.appendChild(createP("time: " + (elapsedTime / 1000) + " seconds"));
         scrambles.forEach((scramble, i) => {
