@@ -1,13 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>demo wasm</title>
-  </head>
-  <body>
-    <h1>demo wasm</h1>
-    <div id="root"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>demo solver</title>
+</head>
+
+<style>
+  p, input {
+    margin: 0;
+  }
+</style>
+
+<body style="display: flex; flex-direction: column; gap: 16px;">
+  <h1>demo solver</h1>
+  <p>alg</p>
+  <input type="text" id="input-alg" value="R U R' F' R U R' U' R' F R2 U' R' U'" />
+  <p>max solutions</p>
+  <input type="text" id="input-max-solutions" value="10" />
+  <p>move set</p>
+  <input type="text" id="input-move-set" value="U U' F F' R R'" />
+  <button id="button-generate">generate</button>
+  <div id="root" style="display: flex; flex-direction: column; gap: 16px;"></div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>

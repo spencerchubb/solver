@@ -1,8 +1,11 @@
-export function scramble(alg: string, moves: string, onlyOrientation: number[], disregard: number[]): Promise<string> {
+export function scramble(alg: string, moves: string, onlyOrientation: number[], disregard: number[], maxSolutions: number): Promise<string[]> {
     return new Promise(resolve => {
         const worker = new Worker(new URL("./worker", import.meta.url));
         worker.onmessage = (event) => {
-            resolve(event.data);
+            // data should be a string of comma-separated scrambles
+            const data: string = event.data;
+            const scrambles = data.split(",");
+            resolve(scrambles);
             worker.terminate();
         }
         worker.onerror = (event) => {
@@ -16,6 +19,7 @@ export function scramble(alg: string, moves: string, onlyOrientation: number[], 
             moves,
             onlyOrientation,
             disregard,
+            maxSolutions,
         });
     });
 }

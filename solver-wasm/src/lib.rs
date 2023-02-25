@@ -8,11 +8,7 @@ extern {
 }
 
 #[wasm_bindgen]
-pub fn scramble(alg: &str, moves: &str, only_orientation: &[usize], disregard: &[usize]) -> String {
-    log(&format!("scrambling {}", alg));
-
-    let max_scrambles = 10;
-
+pub fn scramble(alg: &str, moves: &str, only_orientation: &[usize], disregard: &[usize], max_scrambles: i32) -> String {
     let scrambles = solver::scramble::scramble(alg, moves, only_orientation, disregard, max_scrambles);
 
     let scrambles = scrambles.into_iter().collect::<Vec<String>>();

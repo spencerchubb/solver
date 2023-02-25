@@ -140,7 +140,7 @@ impl Moves {
     // Example: "U,U2,U',F,F2,F',R,R2,R'"
     pub fn from_string(s: &str) -> Moves {
         let mut moves = Vec::new();
-        for m in s.split(',') {
+        for m in s.split(' ') {
             match m {
                 "U" => moves.push(U1_NUM),
                 "U2" => moves.push(U2_NUM),
@@ -187,7 +187,7 @@ mod tests {
 
     #[test]
     fn test_moves() {
-        let moves = Moves::from_string("U,U2,U',F,F2,F',R,R2,R'");
+        let moves = Moves::from_string("U U2 U' F F2 F' R R2 R'");
         assert_eq!(*moves.get_moves(), vec![U1_NUM, U2_NUM, U3_NUM, F1_NUM, F2_NUM, F3_NUM, R1_NUM, R2_NUM, R3_NUM]);
     }
 }

@@ -5,15 +5,16 @@
 * @param {string} moves
 * @param {Uint32Array} only_orientation
 * @param {Uint32Array} disregard
+* @param {number} max_scrambles
 * @returns {string}
 */
-export function scramble(alg: string, moves: string, only_orientation: Uint32Array, disregard: Uint32Array): string;
+export function scramble(alg: string, moves: string, only_orientation: Uint32Array, disregard: Uint32Array, max_scrambles: number): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly scramble: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => void;
+  readonly scramble: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;

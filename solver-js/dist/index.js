@@ -1,8 +1,11 @@
-export function scramble(alg, moves, onlyOrientation, disregard) {
+export function scramble(alg, moves, onlyOrientation, disregard, maxSolutions) {
     return new Promise(function (resolve) {
         var worker = new Worker(new URL("./worker", import.meta.url));
         worker.onmessage = function (event) {
-            resolve(event.data);
+            // data should be a string of comma-separated scrambles
+            var data = event.data;
+            var scrambles = data.split(",");
+            resolve(scrambles);
             worker.terminate();
         };
         worker.onerror = function (event) {
@@ -14,7 +17,8 @@ export function scramble(alg, moves, onlyOrientation, disregard) {
             alg: alg,
             moves: moves,
             onlyOrientation: onlyOrientation,
-            disregard: disregard
+            disregard: disregard,
+            maxSolutions: maxSolutions
         });
     });
 }

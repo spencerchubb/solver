@@ -1,8 +1,6 @@
 let wasm;
 
-const cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
-
-cachedTextDecoder.decode();
+let WASM_VECTOR_LEN = 0;
 
 let cachedUint8Memory0 = null;
 
@@ -12,12 +10,6 @@ function getUint8Memory0() {
     }
     return cachedUint8Memory0;
 }
-
-function getStringFromWasm0(ptr, len) {
-    return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
-}
-
-let WASM_VECTOR_LEN = 0;
 
 const cachedTextEncoder = new TextEncoder('utf-8');
 
@@ -96,14 +88,23 @@ function getInt32Memory0() {
     }
     return cachedInt32Memory0;
 }
+
+const cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+
+cachedTextDecoder.decode();
+
+function getStringFromWasm0(ptr, len) {
+    return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
+}
 /**
 * @param {string} alg
 * @param {string} moves
 * @param {Uint32Array} only_orientation
 * @param {Uint32Array} disregard
+* @param {number} max_scrambles
 * @returns {string}
 */
-export function scramble(alg, moves, only_orientation, disregard) {
+export function scramble(alg, moves, only_orientation, disregard, max_scrambles) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passStringToWasm0(alg, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
@@ -114,7 +115,7 @@ export function scramble(alg, moves, only_orientation, disregard) {
         const len2 = WASM_VECTOR_LEN;
         const ptr3 = passArray32ToWasm0(disregard, wasm.__wbindgen_malloc);
         const len3 = WASM_VECTOR_LEN;
-        wasm.scramble(retptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3);
+        wasm.scramble(retptr, ptr0, len0, ptr1, len1, ptr2, len2, ptr3, len3, max_scrambles);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);
@@ -158,9 +159,6 @@ async function load(module, imports) {
 function getImports() {
     const imports = {};
     imports.wbg = {};
-    imports.wbg.__wbg_log_58c05e126ac818bc = function(arg0, arg1) {
-        console.log(getStringFromWasm0(arg0, arg1));
-    };
 
     return imports;
 }
