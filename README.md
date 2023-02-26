@@ -1,4 +1,4 @@
-# [try the demo](https://spencerchubb.github.io/solver/demo/)
+# solver - [try the demo](https://spencerchubb.github.io/solver/demo/dist/)
 
 This repository is a Rubik's Cube solver for Rust and Javascript.
 
