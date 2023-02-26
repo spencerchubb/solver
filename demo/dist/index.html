@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>demo solver</title>
+  <script type="module" crossorigin src="/assets/index-203b8da8.js"></script>
+</head>
+
+<style>
+  p, input {
+    margin: 0;
+  }
+</style>
+
+<body style="display: flex; flex-direction: column; gap: 16px;">
+  <h1>demo solver</h1>
+  <p>alg</p>
+  <input type="text" id="input-alg" value="R U R' F' R U R' U' R' F R2 U' R' U'" />
+  <p>max solutions</p>
+  <input type="text" id="input-max-solutions" value="10" />
+  <p>move set</p>
+  <input type="text" id="input-move-set" value="U U' F F' R R'" />
+  <button id="button-generate">generate</button>
+  <div id="root" style="display: flex; flex-direction: column; gap: 16px;"></div>
+  
+</body>
+
+</html>

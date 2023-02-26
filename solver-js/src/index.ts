@@ -22,9 +22,9 @@ function scrambleOptionsDefaults(opts: ScrambleOptions): ScrambleOptions {
     };
 }
 
-export function scramble(opts: ScrambleOptions): Promise<string[]> {
+export async function scramble(opts: ScrambleOptions): Promise<string[]> {
     const optsWithDefaults = scrambleOptionsDefaults(opts);
-    
+
     return new Promise(resolve => {
         const worker = new Worker(new URL("./worker", import.meta.url));
         worker.onmessage = (event) => {
