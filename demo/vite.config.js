@@ -4,7 +4,7 @@ import topLevelAwait from "vite-plugin-top-level-await";
 
 export default defineConfig(({ command, mode, ssrBuild }) => {
     return {
-        base: mode === 'development' ? '/' : '/solver/demo/',
+        base: mode === 'development' ? '/' : '/solver/',
         minify: false,
         plugins: [
             wasm(),
