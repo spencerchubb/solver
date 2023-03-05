@@ -1,4 +1,4 @@
-use crate::cube::Cube;
+use crate::cube::{Cube, CubeState};
 
 use smallvec::SmallVec;
 use std::collections::HashMap;
@@ -35,7 +35,7 @@ impl std::hash::BuildHasher for BuildMyHasher {
 }
 
 pub struct Visited {
-    data: HashMap<[u8; 26], SmallVec<[u8; 1]>, BuildMyHasher>,
+    data: HashMap<CubeState, SmallVec<[u8; 1]>, BuildMyHasher>,
 }
 
 impl Visited {
@@ -72,10 +72,10 @@ mod tests {
     #[test]
     fn test_add() {
         let c1 = Cube::from_vec([
-            0, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
         ]);
         let c2 = Cube::from_vec([
-            2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
         ]);
 
         let mut visited = Visited::new();

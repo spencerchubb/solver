@@ -1,23 +1,24 @@
 use crate::{algorithm::{Algorithm, string_to_alg}, constants::DISREGARD, moves::*};
 
-
+// I have decided not to store centers because it makes the program slower.
+// As a result, this program can only solve states where the centers are solved.
+//
 //          00 08 01
-//          09 20 10
+//          09    10
 //          02 11 03
 // 00 09 02 02 11 03 03 10 02 02 08 00
-// 18 24 12 12 21 13 13 25 19 19 23 18
+// 18    12 12    13 13    19 19    18
 // 06 15 04 04 14 05 05 16 07 07 17 06
 //          04 14 05
-//          15 22 16
+//          15    16
 //          06 17 07
 
-// TODO: set pieces to ignore, and set pieces that only care about orientation
-// TODO: disregard centers while searching for solution. hopefully will improve performance
+pub type CubeState = [u8; 20];
 
 #[derive(Copy, Clone)]
 #[derive(PartialEq, Eq, Hash)]
 pub struct Cube {
-    pub state: [u8; 26],
+    pub state: CubeState,
 }
 
 impl Cube {
@@ -26,12 +27,11 @@ impl Cube {
             state: [
                 0, 1, 2, 3, 4, 5, 6, 7, // corners
                 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, //edges
-                0, 1, 2, 3, 4, 5, // centers
             ],
         }
     }
 
-    pub fn from_vec(vec: [u8; 26]) -> Cube {
+    pub fn from_vec(vec: CubeState) -> Cube {
         Cube { state: vec }
     }
 
@@ -313,19 +313,11 @@ impl Cube {
         self.state[17] = flip(self.state[14]);
         self.state[14] = flip(self.state[11]);
         self.state[11] = flip(temp);
-
-        let temp = self.state[20];
-        self.state[20] = self.state[23];
-        self.state[23] = self.state[22];
-        self.state[22] = self.state[21];
-        self.state[21] = temp;
     }
 
     fn m2(&mut self) {
         self.state.swap(8, 14);
         self.state.swap(11, 17);
-        self.state.swap(20, 22);
-        self.state.swap(21, 23);
     }
 
     fn m3(&mut self) {
@@ -334,12 +326,6 @@ impl Cube {
         self.state[11] = flip(self.state[14]);
         self.state[14] = flip(self.state[17]);
         self.state[17] = flip(temp);
-
-        let temp = self.state[20];
-        self.state[20] = self.state[21];
-        self.state[21] = self.state[22];
-        self.state[22] = self.state[23];
-        self.state[23] = temp;
     }
 
     fn e1(&mut self) {
@@ -348,19 +334,11 @@ impl Cube {
         self.state[18] = flip(self.state[19]);
         self.state[19] = flip(self.state[13]);
         self.state[13] = flip(temp);
-
-        let temp = self.state[21];
-        self.state[21] = self.state[24];
-        self.state[24] = self.state[23];
-        self.state[23] = self.state[25];
-        self.state[25] = temp;
     }
 
     fn e2(&mut self) {
         self.state.swap(12, 19);
         self.state.swap(13, 18);
-        self.state.swap(21, 23);
-        self.state.swap(24, 25);
     }
 
     fn e3(&mut self) {
@@ -369,12 +347,6 @@ impl Cube {
         self.state[13] = flip(self.state[19]);
         self.state[19] = flip(self.state[18]);
         self.state[18] = flip(temp);
-
-        let temp = self.state[21];
-        self.state[21] = self.state[25];
-        self.state[25] = self.state[23];
-        self.state[23] = self.state[24];
-        self.state[24] = temp;
     }
 
     fn s1(&mut self) {
@@ -383,19 +355,11 @@ impl Cube {
         self.state[15] = flip(self.state[16]);
         self.state[16] = flip(self.state[10]);
         self.state[10] = flip(temp);
-
-        let temp = self.state[20];
-        self.state[20] = self.state[24];
-        self.state[24] = self.state[22];
-        self.state[22] = self.state[25];
-        self.state[25] = temp;
     }
 
     fn s2(&mut self) {
         self.state.swap(9, 16);
         self.state.swap(10, 15);
-        self.state.swap(20, 22);
-        self.state.swap(24, 25);
     }
 
     fn s3(&mut self) {
@@ -404,12 +368,6 @@ impl Cube {
         self.state[10] = flip(self.state[16]);
         self.state[16] = flip(self.state[15]);
         self.state[15] = flip(temp);
-
-        let temp = self.state[20];
-        self.state[20] = self.state[25];
-        self.state[25] = self.state[22];
-        self.state[22] = self.state[24];
-        self.state[24] = temp;
     }
 }
 
