@@ -23,7 +23,7 @@ pub fn main() {
     let disregard = &[];
     // let disregard = &[8, 9, 10, 11];
 
-    let max_scrambles = 10;
+    let max_scrambles = 50;
 
     let start_time = SystemTime::now()
         .duration_since(UNIX_EPOCH)
