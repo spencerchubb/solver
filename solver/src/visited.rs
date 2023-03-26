@@ -1,6 +1,8 @@
-use crate::cube::{Cube, CubeState};
+use crate::{
+    cube::CubeState,
+    moves::NULL_MOVE,
+};
 
-use smallvec::SmallVec;
 use std::collections::HashMap;
 
 // We use FNV because it's fast and we don't need it to be cryptographically secure.
@@ -34,59 +36,51 @@ impl std::hash::BuildHasher for BuildMyHasher {
     }
 }
 
+type VisitedValue = u8;
+
 pub struct Visited {
-    data: HashMap<CubeState, SmallVec<[u8; 1]>, BuildMyHasher>,
+    data: HashMap<CubeState, VisitedValue, BuildMyHasher>,
 }
 
 impl Visited {
     pub fn new() -> Visited {
         Visited {
-            // data: HashMap::with_capacity(1_000_000),
             data: HashMap::with_capacity_and_hasher(1_000_000, BuildMyHasher),
         }
     }
 
-    pub fn add(&mut self, cube: Cube, mooove: u8) {
-        self.data
-            .entry(cube.state)
-            .or_insert_with(SmallVec::new)
-            .push(mooove);
+    pub fn add(&mut self, state: CubeState, mooove: u8) {
+        self.data.entry(state).or_insert(mooove);
     }
 
-    pub fn get(&self, cube: Cube) -> SmallVec<[u8; 1]> {
+    pub fn get(&self, state: &CubeState) -> VisitedValue {
         self.data
-            .get(&cube.state)
+            .get(state)
             .cloned()
-            .unwrap_or(SmallVec::new())
+            .unwrap_or(NULL_MOVE)
     }
 
-    pub fn contains(&self, cube: &Cube) -> bool {
-        self.data.contains_key(&cube.state)
+    pub fn contains(&self, state: &CubeState) -> bool {
+        self.data.contains_key(state)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::cube::Cube;
 
     #[test]
-    fn test_add() {
-        let c1 = Cube::from_vec([
-            0, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ]);
-        let c2 = Cube::from_vec([
-            2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ]);
+    fn test_basic() {
+        let c1 = Cube::from_vec([0, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        let c2 = Cube::from_vec([2, 3, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
         let mut visited = Visited::new();
-        visited.add(c1, 0);
-        visited.add(c1, 1);
-        visited.add(c2, 2);
+        visited.add(c1.state, 1);
+        visited.add(c2.state, 2);
 
-        let algs = visited.get(c1);
-        assert_eq!(algs.to_vec(), vec![0, 1]);
+        assert_eq!(visited.get(&c1.state), 1);
 
-        let algs = visited.get(c2);
-        assert_eq!(algs.to_vec(), vec![2]);
+        assert_eq!(visited.get(&c2.state), 2);
     }
 }

@@ -1,9 +1,9 @@
-use smallvec::SmallVec;
+use arrayvec::ArrayVec;
 
 use crate::moves::*;
 
-pub type Algorithm = SmallVec<[u8; 8]>;
-pub type Algorithms = SmallVec<[Algorithm; 1]>;
+pub type AlgorithmSegment = ArrayVec<u8, 12>;
+pub type Algorithm = ArrayVec<u8, 24>;
 
 pub fn alg_to_string(alg: &Algorithm) -> String {
     let mut strings = Vec::new();
@@ -121,7 +121,7 @@ pub fn string_to_alg(alg_string: &str) -> Algorithm {
 
 const OPPOSITES: [u8; 6] = [2, 3, 0, 1, 5, 4];
 
-pub fn move_valid_double(alg: &Algorithm, mooove: u8) -> bool {
+pub fn move_valid_double(alg: &AlgorithmSegment, mooove: u8) -> bool {
     if alg.is_empty() {
         return true;
     }
@@ -141,7 +141,7 @@ pub fn move_valid_double(alg: &Algorithm, mooove: u8) -> bool {
     mooove / 3 != OPPOSITES[last_move as usize / 3] || mooove / 3 != second_last_move / 3
 }
 
-pub fn move_valid_single(alg: &Algorithm, mooove: u8) -> bool {
+pub fn move_valid_single(alg: &AlgorithmSegment, mooove: u8) -> bool {
     if alg.is_empty() {
         return true;
     }

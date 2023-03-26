@@ -1,6 +1,6 @@
-use crate::{algorithm::Algorithm, cube::Cube};
+use crate::{algorithm::AlgorithmSegment, cube::Cube};
 
 pub struct Node {
     pub cube: Cube,
-    pub alg: Algorithm,
+    pub alg: AlgorithmSegment,
 }

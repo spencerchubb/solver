@@ -25,17 +25,23 @@ pub fn main() {
 
     let max_scrambles = 50;
 
-    let start_time = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_millis();
+    let iterations = 10;
+    let mut total_time = 0;
+    for i in 0..iterations {
+        let start_time = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis();
 
-    scramble::scramble(alg, &moves, only_orientation, disregard, max_scrambles);
+        scramble::scramble(alg, &moves, only_orientation, disregard, max_scrambles);
 
-    let elapsed = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_millis()
-        - start_time;
-    println!("Elapsed: {} ms", elapsed);
+        let elapsed = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_millis()
+            - start_time;
+        total_time += elapsed;
+        println!("Iteration {}: {} ms", i, elapsed)
+    }
+    println!("Average: {} ms", total_time / 10);
 }

@@ -1,4 +1,6 @@
-use crate::algorithm::{Algorithm};
+use arrayvec::ArrayVec;
+
+use crate::algorithm::{Algorithm, AlgorithmSegment};
 
 pub const U1_NUM: u8 = 0;
 pub const U2_NUM: u8 = 1;
@@ -27,7 +29,6 @@ pub const E3_NUM: u8 = 23;
 pub const S1_NUM: u8 = 24;
 pub const S2_NUM: u8 = 25;
 pub const S3_NUM: u8 = 26;
-// TODO: do we need this?
 pub const NULL_MOVE: u8 = 0xFF;
 
 pub const MOVE_NAMES: [&str; 27] = [
@@ -84,8 +85,8 @@ pub fn invert_move(m: u8) -> u8 {
     }
 }
 
-pub fn invert_algorithm(alg: Algorithm) -> Algorithm {
-    let mut out = Algorithm::new();
+pub fn invert_algorithm<const CAP: usize>(alg: ArrayVec<u8, CAP>) -> ArrayVec<u8, CAP> {
+    let mut out = ArrayVec::new();
     for m in alg {
         out.push(invert_move(m));
     }
@@ -102,8 +103,9 @@ fn cancel_pair_of_moves(m1: u8, m2: u8) -> u8 {
     EQUIVALENCES[m1 as usize][m2 as usize % 3]
 }
 
-pub fn combine_algs(forward: Algorithm, inverse: Algorithm) -> String {
-    let mut combined = forward;
+pub fn combine_algs(forward: AlgorithmSegment, inverse: AlgorithmSegment) -> String {
+    let mut combined = Algorithm::new();
+    combined.extend(forward);
     combined.extend(inverse);
     let mut cleaned: Vec<u8> = Vec::new();
     for m in combined {

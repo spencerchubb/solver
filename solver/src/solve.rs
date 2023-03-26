@@ -1,14 +1,18 @@
-use smallvec::SmallVec;
-
-use crate::algorithm::{Algorithm};
-use crate::moves::{NULL_MOVE, invert_move, Moves};
-use crate::{cube::Cube, queue::Queue, visited::Visited, node::Node};
+use crate::algorithm::{AlgorithmSegment};
+use crate::moves::{invert_move, Moves, NULL_MOVE};
+use crate::{cube::Cube, node::Node, queue::Queue, visited::Visited};
 
 use std::collections::HashSet;
 
-type MoveValid = fn(&Algorithm, u8) -> bool;
+type MoveValid = fn(&AlgorithmSegment, u8) -> bool;
 
-pub fn solve(start: Cube, end: Cube, moves: &Moves, move_valid: MoveValid, max_solutions: i32) -> HashSet<String> {
+pub fn solve(
+    start: Cube,
+    end: Cube,
+    moves: &Moves,
+    move_valid: MoveValid,
+    max_solutions: i32,
+) -> HashSet<String> {
     let mut depth = 0;
     let mut inverse_depth = 0;
 
@@ -16,32 +20,36 @@ pub fn solve(start: Cube, end: Cube, moves: &Moves, move_valid: MoveValid, max_s
     let mut inverse_visited = Visited::new();
 
     let mut queue = Queue::new();
-    queue.push(Node{ cube: start, alg: Algorithm::new() });
+    queue.push(Node {
+        cube: start,
+        alg: AlgorithmSegment::new(),
+    });
 
     let mut inverse_queue = Queue::new();
-    inverse_queue.push(Node{ cube: end, alg: Algorithm::new() });
+    inverse_queue.push(Node {
+        cube: end,
+        alg: AlgorithmSegment::new(),
+    });
 
     let mut solutions = HashSet::new();
     loop {
         let node = queue.pop();
         let inverse_node = inverse_queue.pop();
 
-        let mut seen: HashSet<Cube> = HashSet::new();
-        let algs = reconstruct_algs(&mut seen, &visited, &inverse_node.cube);
-        for alg in algs {
+        let alg = traverse_alg(&visited, &inverse_node.cube);
+        if !alg.is_empty() {
             let mut inverse_node_alg = inverse_node.alg.clone();
             inverse_node_alg.reverse();
             let mut alg = alg.clone();
             alg.reverse();
             let alg_str = crate::moves::combine_algs(inverse_node.alg.clone(), alg);
             if solutions.insert(alg_str.clone()) {
-                println!("{}", alg_str);
+                // println!("{}", alg_str);
             }
         }
 
-        let mut seen: HashSet<Cube> = HashSet::new();
-        let algs = reconstruct_algs(&mut seen, &inverse_visited, &node.cube);
-        for alg in algs {
+        let alg = traverse_alg(&inverse_visited, &node.cube);
+        if !alg.is_empty() {
             let mut alg = alg.clone();
             alg = crate::moves::invert_algorithm(alg);
             alg.reverse();
@@ -49,7 +57,7 @@ pub fn solve(start: Cube, end: Cube, moves: &Moves, move_valid: MoveValid, max_s
             node_alg = crate::moves::invert_algorithm(node_alg);
             let alg_str = crate::moves::combine_algs(alg, node_alg);
             if solutions.insert(alg_str.clone()) {
-                println!("{}", alg_str);
+                // println!("{}", alg_str);
             }
         }
 
@@ -59,12 +67,12 @@ pub fn solve(start: Cube, end: Cube, moves: &Moves, move_valid: MoveValid, max_s
 
         if node.alg.len() > depth {
             depth = node.alg.len();
-            println!("depth: {}", depth);
+            // println!("depth: {}", depth);
         }
 
         if inverse_node.alg.len() > inverse_depth {
             inverse_depth = inverse_node.alg.len();
-            println!("inverse depth: {}", inverse_depth);
+            // println!("inverse depth: {}", inverse_depth);
         }
 
         for mooove in moves.get_moves() {
@@ -72,68 +80,54 @@ pub fn solve(start: Cube, end: Cube, moves: &Moves, move_valid: MoveValid, max_s
                 go_to_child(&mut queue, &node, &mut visited, *mooove);
             }
             if move_valid(&inverse_node.alg, *mooove) {
-                go_to_child(&mut inverse_queue, &inverse_node, &mut inverse_visited, *mooove);
+                go_to_child(
+                    &mut inverse_queue,
+                    &inverse_node,
+                    &mut inverse_visited,
+                    *mooove,
+                );
             }
         }
     }
 }
 
-fn reconstruct_algs(seen: &mut HashSet<Cube>, visited: &Visited, cube: &Cube) -> Vec<Algorithm> {
-    let mut algs: Vec<Algorithm> = Vec::new();
-
-    let moves = visited.get(*cube);
-    for mooove in moves {
-        let mut cpy = *cube;
-        if mooove == NULL_MOVE {
-            return algs;
-        }
-        let inverted_move = invert_move(mooove);
-        cpy.perform_move(inverted_move);
-
-        if seen.contains(&cpy) {
-            continue;
-        } else {
-            seen.insert(cpy);
-        }
-
-        let algs_subset = reconstruct_algs(seen, visited, &cpy);
-        if algs_subset.is_empty() {
-            let mut small_vec = SmallVec::new();
-            small_vec.push(inverted_move);
-            algs.push(small_vec);
-        } else {
-            for alg in algs_subset {
-                let mut alg = alg;
-                alg.push(inverted_move);
-                algs.push(alg);
-            }
-        }
+fn traverse_alg(visited: &Visited, cube: &Cube) -> AlgorithmSegment {
+    let mooove = visited.get(&cube.state);
+    if mooove == NULL_MOVE {
+        return AlgorithmSegment::new();
     }
 
-    // If 'moves' is empty, then this will just return an empty vec.
-    // This is the base case of the recursion.
-    algs
+    let mut cpy = *cube;
+    let inverted_move = invert_move(mooove);
+    cpy.perform_move(inverted_move);
+
+    let mut alg = traverse_alg(visited, &cpy);
+
+    alg.push(inverted_move);
+    alg
 }
 
 fn go_to_child(queue: &mut Queue<Node>, node: &Node, visited: &mut Visited, mooove: u8) {
     let mut cpy = node.cube;
     cpy.perform_move(mooove);
-    
-    if visited.contains(&cpy) {
+
+    if visited.contains(&cpy.state) {
         return;
     }
 
     let mut new_alg = node.alg.clone();
     new_alg.push(mooove);
 
-    queue.push(Node{ cube: cpy, alg: new_alg });
+    queue.push(Node {
+        cube: cpy,
+        alg: new_alg,
+    });
 
-    visited.add(cpy, mooove);
+    visited.add(cpy.state, mooove);
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::moves::*;
     use super::*;
 
     #[test]

@@ -8,4 +8,4 @@ name = "solver"
 path = "src/main.rs"
 
 [dependencies]
-smallvec = "1.10.0"
+arrayvec = "0.7.2"
