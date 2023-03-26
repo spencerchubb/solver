@@ -1,5 +1,7 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use crate::scramble::ScrambleArgs;
+
 pub mod algorithm;
 pub mod constants;
 pub mod cube;
@@ -33,7 +35,15 @@ pub fn main() {
             .unwrap()
             .as_millis();
 
-        scramble::scramble(alg, &moves, only_orientation, disregard, max_scrambles);
+        scramble::scramble(ScrambleArgs {
+            alg: alg.to_string(),
+            moves: moves.to_string(),
+            only_orientation: only_orientation.to_vec(),
+            disregard: disregard.to_vec(),
+            max_scrambles,
+            // solution_found: |s: String| println!("{}", s),
+            solution_found: |_: String| {},
+        });
 
         let elapsed = SystemTime::now()
             .duration_since(UNIX_EPOCH)

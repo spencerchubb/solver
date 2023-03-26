@@ -6,13 +6,17 @@ use std::collections::HashSet;
 
 type MoveValid = fn(&AlgorithmSegment, u8) -> bool;
 
-pub fn solve(
-    start: Cube,
-    end: Cube,
-    moves: &Moves,
-    move_valid: MoveValid,
-    max_solutions: i32,
-) -> HashSet<String> {
+pub struct SolveArgs {
+    pub start: Cube,
+    pub end: Cube,
+    pub moves: Moves,
+    pub move_valid: MoveValid,
+    pub max_solutions: i32,
+    pub solution_found: fn(String) -> (),
+    pub log: fn(String) -> (),
+}
+
+pub fn solve(args: SolveArgs) -> HashSet<String> {
     let mut depth = 0;
     let mut inverse_depth = 0;
 
@@ -21,13 +25,13 @@ pub fn solve(
 
     let mut queue = Queue::new();
     queue.push(Node {
-        cube: start,
+        cube: args.start,
         alg: AlgorithmSegment::new(),
     });
 
     let mut inverse_queue = Queue::new();
     inverse_queue.push(Node {
-        cube: end,
+        cube: args.end,
         alg: AlgorithmSegment::new(),
     });
 
@@ -44,7 +48,7 @@ pub fn solve(
             alg.reverse();
             let alg_str = crate::moves::combine_algs(inverse_node.alg.clone(), alg);
             if solutions.insert(alg_str.clone()) {
-                // println!("{}", alg_str);
+                (args.solution_found)(alg_str);
             }
         }
 
@@ -57,29 +61,29 @@ pub fn solve(
             node_alg = crate::moves::invert_algorithm(node_alg);
             let alg_str = crate::moves::combine_algs(alg, node_alg);
             if solutions.insert(alg_str.clone()) {
-                // println!("{}", alg_str);
+                (args.solution_found)(alg_str);
             }
         }
 
-        if solutions.len() >= max_solutions as usize {
+        if solutions.len() >= args.max_solutions as usize {
             return solutions;
         }
 
         if node.alg.len() > depth {
             depth = node.alg.len();
-            // println!("depth: {}", depth);
+            (args.log)(format!("depth: {}", depth));
         }
 
         if inverse_node.alg.len() > inverse_depth {
             inverse_depth = inverse_node.alg.len();
-            // println!("inverse depth: {}", inverse_depth);
+            (args.log)(format!("inverse depth: {}", inverse_depth));
         }
 
-        for mooove in moves.get_moves() {
-            if move_valid(&node.alg, *mooove) {
+        for mooove in args.moves.get_moves() {
+            if (args.move_valid)(&node.alg, *mooove) {
                 go_to_child(&mut queue, &node, &mut visited, *mooove);
             }
-            if move_valid(&inverse_node.alg, *mooove) {
+            if (args.move_valid)(&inverse_node.alg, *mooove) {
                 go_to_child(
                     &mut inverse_queue,
                     &inverse_node,
@@ -139,7 +143,15 @@ mod tests {
         let moves = Moves::from_string("U,U2,U',F,F2,F',R,R2,R'");
         let max_solutions = 10;
 
-        let solutions = solve(start, end, &moves, |_, _| true, max_solutions);
+        let solutions = solve(SolveArgs {
+            start,
+            end,
+            moves: moves,
+            move_valid: |_, _| true,
+            max_solutions,
+            solution_found: |s| println!("{}", s),
+            log: |s| println!("{}", s),
+        });
         let solutions: Vec<String> = solutions.into_iter().collect();
         let expected = [
             "R U2 F' R' F U' F' R F U' R' U'",
