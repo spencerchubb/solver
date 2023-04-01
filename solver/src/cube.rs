@@ -85,7 +85,7 @@ impl Cube {
     // This means that the permutation is disregarded.
     pub fn set_only_orientation(&mut self, pieces: &[usize]) {
         for i in pieces {
-            self.state[*i] |= 0x0F;
+            self.state[*i] |= 0xF0;
         }
     }
 

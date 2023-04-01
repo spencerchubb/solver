@@ -15,15 +15,16 @@ pub mod visited;
 pub fn main() {
     // let alg = "R U R' F' R U R' U' R' F R2 U' R' U'";
     // let alg = "R U R' F' R U R' U' R' F R U' R' F R F'";
-    let alg = "F R U R' U' R U' R' U' R U R' F'";
+    // let alg = "F R U R' U' R U' R' U' R U R' F'";
+    let alg = "R U2 R2 F R F' U2 R' F R F'";
 
     let moves = "U U' F F' R R'";
-
-    let only_orientation = &[];
-    // let only_orientation = &[0, 1, 2, 3, 8, 9, 10, 11];
-
+    let only_orientation: &[usize] = &[];
     let disregard = &[];
-    // let disregard = &[8, 9, 10, 11];
+    
+    // OLL case
+    // let alg = "R U2 R2 F R F' U2 R' F R F'";
+    // let only_orientation = &[0, 1, 2, 3, 8, 9, 10, 11];
 
     let max_scrambles = 50;
 
@@ -53,5 +54,5 @@ pub fn main() {
         total_time += elapsed;
         println!("Iteration {}: {} ms", i, elapsed)
     }
-    println!("Average: {} ms", total_time / 10);
+    println!("Average: {} ms", total_time / iterations);
 }
