@@ -40,7 +40,7 @@ document.querySelector("#button-generate")?.addEventListener("click", () => {
 
 function validateMoves(moves: string): boolean {
     const moveSet = moves.split(" ");
-    const validMoves = new Set(["U", "U'", "U2", "D", "D'", "D2", "L", "L'", "L2", "R", "R'", "R2", "F", "F'", "F2", "B", "B'", "B2"]);
+    const validMoves = new Set(["U", "U'", "U2", "D", "D'", "D2", "L", "L'", "L2", "R", "R'", "R2", "F", "F'", "F2", "B", "B'", "B2", "M", "M'", "M2"]);
     return moveSet.every((move) => validMoves.has(move));
 }
 

@@ -15,8 +15,7 @@ pub mod visited;
 pub fn main() {
     // let alg = "R U R' F' R U R' U' R' F R2 U' R' U'";
     // let alg = "R U R' F' R U R' U' R' F R U' R' F R F'";
-    // let alg = "F R U R' U' R U' R' U' R U R' F'";
-    let alg = "R U2 R2 F R F' U2 R' F R F'";
+    let alg = "F R U R' U' R U' R' U' R U R' F'";
 
     let moves = "U U' F F' R R'";
     let only_orientation: &[usize] = &[];
