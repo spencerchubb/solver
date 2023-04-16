@@ -2,7 +2,8 @@ use arrayvec::ArrayVec;
 
 use crate::moves::*;
 
-pub type AlgorithmSegment = ArrayVec<u8, 12>;
+pub const MAX_LEN: usize = 12;
+pub type AlgorithmSegment = ArrayVec<u8, MAX_LEN>;
 pub type Algorithm = ArrayVec<u8, 24>;
 
 pub fn alg_to_string(alg: &Algorithm) -> String {

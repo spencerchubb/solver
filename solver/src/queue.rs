@@ -14,6 +14,10 @@ impl<T> Queue<T> {
     }
 
     pub fn pop(&mut self) -> T {
-        self.data.pop_front().unwrap()
+        self.data.pop_front().expect("Queue is empty. It could be empty because the 'moves' are not able to reach some pieces.")
+    }
+
+    pub fn len(&self) -> usize {
+        self.data.len()
     }
 }

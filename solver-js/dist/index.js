@@ -34,7 +34,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-function scrambleOptionsDefaults(opts) {
+function solveOptionsDefaults(method, opts) {
     var _a, _b, _c;
     if (opts.alg === null || opts.alg === undefined) {
         throw new Error("alg must be defined");
@@ -43,6 +43,7 @@ function scrambleOptionsDefaults(opts) {
         throw new Error("moves must be defined");
     }
     return {
+        method: method,
         alg: opts.alg,
         moves: opts.moves,
         onlyOrientation: (_a = opts.onlyOrientation) !== null && _a !== void 0 ? _a : [],
@@ -52,16 +53,30 @@ function scrambleOptionsDefaults(opts) {
 }
 export function scramble(opts) {
     return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, setupWorker("scramble", opts)];
+        });
+    });
+}
+export function solve(opts) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/, setupWorker("solve", opts)];
+        });
+    });
+}
+function setupWorker(method, opts) {
+    return __awaiter(this, void 0, void 0, function () {
         var optsWithDefaults;
         return __generator(this, function (_a) {
-            optsWithDefaults = scrambleOptionsDefaults(opts);
+            optsWithDefaults = solveOptionsDefaults(method, opts);
             return [2 /*return*/, new Promise(function (resolve) {
                     var worker = new Worker(new URL("./worker", import.meta.url));
                     worker.onmessage = function (event) {
-                        // data should be a string of comma-separated scrambles
+                        // data should be a string of comma-separated solutions
                         var data = event.data;
-                        var scrambles = data.split(",");
-                        resolve(scrambles);
+                        var solutions = data.split(",");
+                        resolve(solutions);
                         worker.terminate();
                     };
                     worker.onerror = function (event) {

@@ -1,4 +1,4 @@
-use crate::algorithm::{AlgorithmSegment};
+use crate::algorithm::{AlgorithmSegment, MAX_LEN};
 use crate::moves::{invert_move, Moves, NULL_MOVE};
 use crate::{cube::Cube, node::Node, queue::Queue, visited::Visited};
 
@@ -40,7 +40,7 @@ pub fn solve(args: SolveArgs) -> HashSet<String> {
         let node = queue.pop();
         let inverse_node = inverse_queue.pop();
 
-        let alg = traverse_alg(&visited, &inverse_node.cube);
+        let alg = traverse_alg(&visited, &inverse_node.cube, 0);
         if !alg.is_empty() {
             let mut inverse_node_alg = inverse_node.alg.clone();
             inverse_node_alg.reverse();
@@ -52,7 +52,7 @@ pub fn solve(args: SolveArgs) -> HashSet<String> {
             }
         }
 
-        let alg = traverse_alg(&inverse_visited, &node.cube);
+        let alg = traverse_alg(&inverse_visited, &node.cube, 0);
         if !alg.is_empty() {
             let mut alg = alg.clone();
             alg = crate::moves::invert_algorithm(alg);
@@ -95,9 +95,9 @@ pub fn solve(args: SolveArgs) -> HashSet<String> {
     }
 }
 
-fn traverse_alg(visited: &Visited, cube: &Cube) -> AlgorithmSegment {
+fn traverse_alg(visited: &Visited, cube: &Cube, len: usize) -> AlgorithmSegment {
     let mooove = visited.get(&cube.state);
-    if mooove == NULL_MOVE {
+    if mooove == NULL_MOVE || len >= MAX_LEN {
         return AlgorithmSegment::new();
     }
 
@@ -105,7 +105,7 @@ fn traverse_alg(visited: &Visited, cube: &Cube) -> AlgorithmSegment {
     let inverted_move = invert_move(mooove);
     cpy.perform_move(inverted_move);
 
-    let mut alg = traverse_alg(visited, &cpy);
+    let mut alg = traverse_alg(visited, &cpy, len + 1);
 
     alg.push(inverted_move);
     alg
@@ -115,6 +115,8 @@ fn go_to_child(queue: &mut Queue<Node>, node: &Node, visited: &mut Visited, mooo
     let mut cpy = node.cube;
     cpy.perform_move(mooove);
 
+    // TODO could increase performance by combining add() and contains()
+    // Just have add() return a boolean
     if visited.contains(&cpy.state) {
         return;
     }

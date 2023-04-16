@@ -9,12 +9,22 @@
 * @returns {string}
 */
 export function scramble(alg: string, moves: string, only_orientation: Uint32Array, disregard: Uint32Array, max_scrambles: number): string;
+/**
+* @param {string} alg
+* @param {string} moves
+* @param {Uint32Array} only_orientation
+* @param {Uint32Array} disregard
+* @param {number} max_solutions
+* @returns {string}
+*/
+export function solve(alg: string, moves: string, only_orientation: Uint32Array, disregard: Uint32Array, max_solutions: number): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly scramble: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => void;
+  readonly solve: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number, j: number) => void;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;

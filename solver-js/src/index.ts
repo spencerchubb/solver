@@ -1,4 +1,6 @@
-type ScrambleOptions = {
+type Method = "scramble" | "solve";
+
+type SolveOptions = {
     alg: string;
     moves: string;
     onlyOrientation?: number[];
@@ -6,7 +8,11 @@ type ScrambleOptions = {
     maxSolutions?: number;
 };
 
-function scrambleOptionsDefaults(opts: ScrambleOptions): ScrambleOptions {
+type WorkerOptions = {
+    method: Method;
+} & SolveOptions;
+
+function solveOptionsDefaults(method: Method, opts: SolveOptions): WorkerOptions {
     if (opts.alg === null || opts.alg === undefined) {
         throw new Error("alg must be defined");
     }
@@ -14,6 +20,7 @@ function scrambleOptionsDefaults(opts: ScrambleOptions): ScrambleOptions {
         throw new Error("moves must be defined");
     }
     return {
+        method,
         alg: opts.alg,
         moves: opts.moves,
         onlyOrientation: opts.onlyOrientation ?? [],
@@ -22,16 +29,24 @@ function scrambleOptionsDefaults(opts: ScrambleOptions): ScrambleOptions {
     };
 }
 
-export async function scramble(opts: ScrambleOptions): Promise<string[]> {
-    const optsWithDefaults = scrambleOptionsDefaults(opts);
+export async function scramble(opts: SolveOptions): Promise<string[]> {
+    return setupWorker("scramble", opts);
+}
+
+export async function solve(opts: SolveOptions): Promise<string[]> {
+    return setupWorker("solve", opts);
+}
+
+async function setupWorker(method: Method, opts: SolveOptions): Promise<string[]> {
+    const optsWithDefaults = solveOptionsDefaults(method, opts);
 
     return new Promise(resolve => {
         const worker = new Worker(new URL("./worker", import.meta.url));
         worker.onmessage = (event) => {
-            // data should be a string of comma-separated scrambles
+            // data should be a string of comma-separated solutions
             const data: string = event.data;
-            const scrambles = data.split(",");
-            resolve(scrambles);
+            const solutions = data.split(",");
+            resolve(solutions);
             worker.terminate();
         }
         worker.onerror = (event) => {
