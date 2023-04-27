@@ -55,10 +55,10 @@ pub fn solve(args: SolveArgs) -> HashSet<String> {
         let alg = traverse_alg(&inverse_visited, &node.cube, 0);
         if !alg.is_empty() {
             let mut alg = alg.clone();
-            alg = crate::moves::invert_algorithm(alg);
+            alg = crate::moves::invert_alg_segment(alg);
             alg.reverse();
             let mut node_alg = node.alg.clone();
-            node_alg = crate::moves::invert_algorithm(node_alg);
+            node_alg = crate::moves::invert_alg_segment(node_alg);
             let alg_str = crate::moves::combine_algs(alg, node_alg);
             if solutions.insert(alg_str.clone()) {
                 (args.solution_found)(alg_str);

@@ -4,7 +4,7 @@ use crate::moves::*;
 
 pub const MAX_LEN: usize = 12;
 pub type AlgorithmSegment = ArrayVec<u8, MAX_LEN>;
-pub type Algorithm = ArrayVec<u8, 24>;
+pub type Algorithm = Vec<u8>;
 
 pub fn alg_to_string(alg: &Algorithm) -> String {
     let mut strings = Vec::new();

@@ -85,7 +85,16 @@ pub fn invert_move(m: u8) -> u8 {
     }
 }
 
-pub fn invert_algorithm<const CAP: usize>(alg: ArrayVec<u8, CAP>) -> ArrayVec<u8, CAP> {
+pub fn invert_algorithm(alg: Algorithm) -> Algorithm {
+    let mut out = Algorithm::new();
+    for m in alg {
+        out.push(invert_move(m));
+    }
+    out.reverse();
+    out
+}
+
+pub fn invert_alg_segment(alg: AlgorithmSegment) -> AlgorithmSegment {
     let mut out = ArrayVec::new();
     for m in alg {
         out.push(invert_move(m));
