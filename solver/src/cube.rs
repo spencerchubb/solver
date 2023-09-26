@@ -81,11 +81,9 @@ impl Cube {
 
     // pieces is an array of piece indices.
     // This function makes it so we only consider the orientation of the pieces.
-    // The way this works is by settings the 5th-8th bits to 1.
-    // This means that the permutation is disregarded.
     pub fn set_only_orientation(&mut self, pieces: &[usize]) {
         for i in pieces {
-            self.state[*i] |= 0xF0;
+            self.state[*i] |= 0x0F;
         }
     }
 
@@ -375,6 +373,7 @@ fn twist_cw(b: u8) -> u8 {
     if b == DISREGARD {
         return b;
     }
+
     let upper = b & 0xF0;
     let lower = b & 0x0F;
     ((upper + 1) % 3) << 4 | lower
@@ -384,6 +383,7 @@ fn twist_ccw(b: u8) -> u8 {
     if b == DISREGARD {
         return b;
     }
+
     let upper = b & 0xF0;
     let lower = b & 0x0F;
     ((upper + 2) % 3) << 4 | lower
@@ -393,6 +393,7 @@ fn flip(b: u8) -> u8 {
     if b == DISREGARD {
         return b;
     }
+
     b ^ 0b00010000
 }
 
